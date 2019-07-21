@@ -32,11 +32,11 @@ var repairman =  {
                 filter: (s) => {
                     var dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
                     var t = s.structureType;
-                    return (((t != STRUCTURE_ROAD && t != STRUCTURE_WALL) && s.hits < 0.25 * s.hitsMax) ||
+                    return (((t == STRUCTURE_WALL || t == STRUCTURE_RAMPART) && s.hits < 50000) ||
                             ((t != STRUCTURE_ROAD && t != STRUCTURE_WALL && 
                                 t != STRUCTURE_RAMPART) && s.hits < s.hitsMax) ||
                             (t == STRUCTURE_ROAD && s.hits < s.hitsMax &&
-                            (Memory.roomData[creep.room.name].travelData[dat] > 30)));
+                            (Memory.roomData[creep.room.name].travelData[dat] > 15)));
                 }
             })).sort((a,b) => priority[b.structureType] - priority[a.structureType]);
             if(targets.length > 0) {

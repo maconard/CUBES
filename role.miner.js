@@ -16,6 +16,13 @@ var miner =  {
 
         if(!creep.memory.working) {
             creep.say("mining");
+            var t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 30, {
+                    filter: (r) => r.resourceType != RESOURCE_ENERGY});
+            if(t.length > 0) {
+                creep.pickup(t[0])
+                creep.moveTo(t[0]);
+                return;
+            }
             var source = creep.pos.findClosestByPath(FIND_MINERALS);
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                 if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {

@@ -4,7 +4,8 @@ var limits = {
     [STRUCTURE_TOWER]: { 0: 0, 1: 0, 2: 0, 3: 1, 4: 1, 5: 2, 6: 2, 7: 3, 8: 6},
     [STRUCTURE_STORAGE]: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1 },
     [STRUCTURE_ROAD]: { 0: 0, 1: 10, 2: 150, 3: 150, 4: 150, 5: 150, 6: 150, 7: 200, 8: 200 },
-    [STRUCTURE_SPAWN]: { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 3 }
+    [STRUCTURE_SPAWN]: { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 3 },
+    [STRUCTURE_RAMPART]: { 0: 0, 1: 00, 2: 0, 3: 10, 4: 20, 5: 50, 6: 100, 7: 200, 8: 200 }
 };
 
 var canBuildHere = function(room,x,y) {
@@ -38,6 +39,7 @@ var taskManage = {
             this.plan(spawn1, STRUCTURE_TOWER, 'towers', 1);
             this.plan(spawn1, STRUCTURE_SPAWN, 'spawns', 1);
             this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
+            this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
         }
     },
     plan: function(spawn1, stype, eng, ptype) {
@@ -104,6 +106,18 @@ var taskManage = {
                     attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
                 }
             };
+        } else if(ptype == 4) { //construct on important structures
+            var structs = r.find(FIND_STRUCTURES, {
+                filter: (s) => {
+                    var t = s.structureType;
+                    return (t == STRUCTURE_SPAWN || t == STRUCTURE_STORAGE || t == STRUCTURE_POWER_SPAWN ||
+                        t == STRUCTURE_NUKER || t == STRUCTURE_OBSERVER || t == STRUCTURE_TOWER ||
+                        t == STRUCTURE_TERMINAL || t == STRUCTURE_LAB);
+            }});
+            structs.forEach(function(s) {
+                tgt = s.pos;
+                attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
+            });
         }
     }
 }
@@ -111,7 +125,7 @@ var taskManage = {
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;
 
-    Creep.prototype.moveTo = function(target, opts={reusePath:10}) {
+    Creep.prototype.moveTo = function(target, opts={}) {
         // this._moveTo(target,opts);
         var path = this.pos.findPathTo(target,opts);
         if(path.length > 0) {
@@ -129,12 +143,12 @@ if(!Creep.prototype._moveTo) {
     }
 }
 
-// if(!Creep.prototype._say) {
-//     Creep.prototype._say = Creep.prototype.say;
-//     Creep.prototype.say = function(x) {
-//         //   this._say("[" + this.pos.x + "," + this.pos.y + "]");
-//         // Creep.prototype._say(x);
-//     };
-// }
+if(!Creep.prototype._say) {
+    Creep.prototype._say = Creep.prototype.say;
+    Creep.prototype.say = function(x) {
+        //   this._say("[" + this.pos.x + "," + this.pos.y + "]");
+        // Creep.prototype._say(x);
+    };
+}
 
 module.exports = taskManage;

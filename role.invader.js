@@ -1,7 +1,7 @@
 var invader =  {
     run: function(creep) {
         var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-        var targetRoom = 'W1N1';
+        var targetRoom = 'W4N4';
         if(creep.room.name == targetRoom) {
             var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
             if(target) {
@@ -43,15 +43,14 @@ var invader =  {
                     return;
                 }
             }
-            creep.moveTo(creep.pos.findClosestByPath(creep.room.findExitTo(targetRoom)), {reusePath: 25, swampCost: 2});
+            creep.moveTo(creep.pos.findClosestByPath(creep.room.findExitTo(targetRoom)), {reusePath: 25, swampCost: 5});
         }
     },
-    base: [TOUGH,MOVE,ATTACK],
+    base: [TOUGH,MOVE,RANGED_ATTACK],
     add: {
-        0: { type: ATTACK, amt: 7},
+        0: { type: RANGED_ATTACK, amt: 14},
         1: { type: MOVE, amt: 19},
-        2: { type: TOUGH, amt: 11},
-        3: { type: TOUGH, amt: 11}
+        2: { type: TOUGH, amt: 14}
     }
 }
 

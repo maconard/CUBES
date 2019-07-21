@@ -32,8 +32,9 @@ var courier =  {
             if(!target) {
                 target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => {
-                        return (s.structureType == STRUCTURE_CONTAINER) 
-                            && s.store[RESOURCE_ENERGY] < s.storeCapacity
+                        return ((s.structureType == STRUCTURE_CONTAINER) 
+                            && s.store[RESOURCE_ENERGY] < s.storeCapacity) ||
+                            (s.structureType == STRUCTURE_POWER_SPAWN && s.energy < s.energyCapacity)
                     }
                 });
             }
@@ -55,11 +56,11 @@ var courier =  {
             }
             var source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
-                    && s.store[RESOURCE_ENERGY] > 0)});   
+                    && s.store[RESOURCE_ENERGY] > 50)});   
             if(!source) {
                 source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => ((s.structureType == STRUCTURE_STORAGE) 
-                    && s.store[RESOURCE_ENERGY] > 0)});
+                    && s.store[RESOURCE_ENERGY] > 100)});
             }
             if(source) {
                 if(creep.withdraw(source, RESOURCE_ENERGY) != OK) {

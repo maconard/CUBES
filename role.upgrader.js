@@ -14,7 +14,25 @@ var upgrader = {
 
         if(creep.memory.working) {
             creep.say('upgrading');
-            if(config.upgradeTarget) {
+            if(config.upgradeTarget && spawn1.room.controller.level > 6) {
+
+                var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
+                    filter: (structure) => {
+                        return (structure.structureType == STRUCTURE_EXTENSION || 
+                        structure.structureType == STRUCTURE_RAMPART ||
+                        structure.structureType == STRUCTURE_SPAWN);
+                    }
+                });
+                if(!target) {
+                    target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                }
+                if(target) {
+                    if(creep.build(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    }
+                    return;
+                }
+
                 var targetRoom = config.upgradeTarget;
                 if(!(creep.room.name == targetRoom)) {
                     creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetRoom)));
@@ -35,6 +53,19 @@ var upgrader = {
                 return;
             }
             
+            if(config.upgradeTarget != "" && creep.room.name == config.upgradeTarget) {
+                var source = creep.pos.findClosestByPath(FIND_SOURCES, {
+                    filter: (s) => {
+                        return s.room.name == config.upgradeTarget;
+                    }
+                });
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                    if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+                    }
+                }
+                return;
+            }
+            
             var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => (s.structureType == STRUCTURE_CONTAINER || 
                                 s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50});
@@ -43,11 +74,6 @@ var upgrader = {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }
             } else {
-                // var source = creep.pos.findClosestByPath(FIND_SOURCES);
-                // if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                //     if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
-                //     }
-                // }
                 creep.moveTo(spawn1.room.controller);
             }
         }
@@ -57,7 +83,9 @@ var upgrader = {
         0: { type: WORK, amt: 12 },
         1: { type: CARRY, amt: 12 },
         // 2: { type: WORK, amt: 12},
-        2: { type: MOVE, amt: 23 }
+        2: { type: MOVE, amt: 23 },
+        3: { type: TOUGH, amt: 5 },
+        4: { type: TOUGH, amt: 5 }
     }
 };
 

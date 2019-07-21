@@ -9,12 +9,12 @@ var taskGarbage = {
         }
 
         ticks++;
-        if(ticks % 230 == 0) {
+        if(ticks % 250 == 0) {
             _.toArray(Game.spawns).forEach(function(s) {
                 if(!Memory.roomData[s.room.name]) return;
                 var travelDat = Memory.roomData[s.room.name].travelData;
                 for(key in travelDat) {
-                    travelDat[key] -= 4;
+                    travelDat[key] -= 3;
                     if(travelDat[key] <= 0) {
                         delete Memory.roomData[s.room.name].travelData[key];
                     }

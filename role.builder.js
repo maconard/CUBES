@@ -13,7 +13,7 @@ var builder =  {
 
         if(creep.memory.working) {
             creep.say('building');
-            if(config.buildTarget != "") {
+            if(config.buildTarget != "" && spawn1.room.controller.level > 6) {
                 var targetRoom = config.buildTarget;
                 if(!(creep.room.name == targetRoom)) {
                     creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetRoom)));
@@ -48,6 +48,20 @@ var builder =  {
                 creep.moveTo(t[0]);
                 return;
             }
+
+            if(config.buildTarget != "" && creep.room.name == config.buildTarget) {
+                var source = creep.pos.findClosestByPath(FIND_SOURCES, {
+                    filter: (s) => {
+                        return s.room.name == config.buildTarget;
+                    }
+                });
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                    if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+                    }
+                }
+                return;
+            }
+
             var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return ((structure.structureType == STRUCTURE_CONTAINER || 
@@ -61,11 +75,6 @@ var builder =  {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }       
             } else {
-                // var source = creep.pos.findClosestByPath(FIND_SOURCES);
-                // if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                //     if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
-                //     }
-                // }
                 creep.moveTo(spawn1.room.controller);
             }
         }
@@ -74,7 +83,9 @@ var builder =  {
     add: {
         0: { type: WORK, amt: 12 },
         1: { type: CARRY, amt: 12 },
-        2: { type: MOVE, amt: 23 }
+        2: { type: MOVE, amt: 23 },
+        3: { type: TOUGH, amt: 5 },
+        4: { type: TOUGH, amt: 5 }
     }
 };
 

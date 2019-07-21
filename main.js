@@ -28,10 +28,10 @@ main.loop = function() {
             tasks.forEach(function(task) { 
                 task.run(spawns); 
             });
-            global.displays.push("");
+            // global.displays.push("");
         } catch(e) {
             console.log("ERROR in ROOM " + r.name + ": " + e);
-            console.log(e.stack);
+            console.log(e.stack); Game.notify(e.stack);
         }
     });
     visuals.global();

@@ -3,6 +3,7 @@ module.exports = {
     buildTarget: "",
     upgradeTarget: "",
     targetRoom: "",
+    spawnEnergy: { 0: 300, 1: 800, 2: 800, 3: 800, 4: 850, 5: 850, 6: 900, 7: 950, 8: 1000},
     count: {
         override: {
             MAX_HARVESTER:      0,

@@ -103,16 +103,18 @@ var taskCreeps = {
             filter: (structure) => {
                 return (structure.structureType == STRUCTURE_EXTRACTOR);
             }}).length;
-        // if(spawns[0].room.name == "W8N3")
-        // console.log(extractors);
-        if(roles.miner.num < roles.miner.max && extractors > 0) {
+        var mineral = spawns[0].room.find(FIND_MINERALS);
+        if(mineral.length > 0 && mineral[0].mineralAmount > 0) mineral = true;
+        else mineral = false;
+
+        if(roles.miner.num < roles.miner.max && extractors > 0 && mineral) {
             this.spawn(spawns,roles, 'miner');
         }      
-        if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 3000) {
-            this.spawn(spawns,roles, 'invader',false,3000);
+        if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 5000) {
+            this.spawn(spawns,roles, 'invader',false,6000);
         }        
     },
-    spawn: function(spawns,roles,role,override=false,energy=900) {
+    spawn: function(spawns,roles,role,override=false,energy=false) {
         if(typeof(Memory.role_ids) == 'undefined') {
             Memory.role_ids = {};
         }
@@ -130,13 +132,15 @@ var taskCreeps = {
                 used = {[TOUGH]:0,[WORK]:0,[CARRY]:0,[MOVE]:0,[HEAL]:0,[CLAIM]:0,[ATTACK]:0,[RANGED_ATTACK]:0},
                 i = 0,
                 len = _.toArray(a).length;
-                
+            if(!energy) energy = config.spawnEnergy[spawns[0].room.controller.level];
             var sum = getSum(a);
-            while((nrg <= spawns[0].room.energyAvailable && nrg <= energy) && (i < sum)) {
+            var parts = 0;
+            while((nrg <= spawns[0].room.energyAvailable && nrg <= energy) && (parts < sum) && (i < 300)) {
                 var at = i % len;
                 var x = a[at].type;
                 if(used[x] >= a[at].amt) { i++; continue; }
                 if(nrg + cost[x] > spawns[0].room.energyAvailable) break;
+                parts++;
                 body.push(x);
                 nrg += cost[x];
                 used[x]++;

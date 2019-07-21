@@ -45,8 +45,8 @@ var harvester =  {
     base: [WORK,MOVE],
     add: {
         0: { type: WORK, amt: 4},
-        1: { type: WORK, amt: 4},
-        2: { type: MOVE, amt: 2}
+        1: { type: MOVE, amt: 2}
+
     }
 }
 

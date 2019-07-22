@@ -7,8 +7,8 @@ visuals = tasks[4];
 if(!Memory.roomData) Memory.roomData = {};
 delete Memory.tickData;
 Memory.tickData = { time: new Date().getTime() / 1000, ticks: 0, rate: "Calculating"};
-let main = module.exports; 
 
+let main = module.exports; 
 main.loop = function() {
     let myRooms = _.values(Game.rooms);
     global.displays = [];
@@ -17,16 +17,18 @@ main.loop = function() {
             let spawns = r.find(FIND_MY_SPAWNS)
             if(spawns.length == 0 || !r.controller.my) return;
             if(!Memory.roomData[r.name]) Memory.roomData[r.name] = { travelData: {}, sourceData: {} };
-            if(!Memory.roomData[r.name].sourceData) Memory.roomData[r.name].sourceData = {};
-            r.find(FIND_SOURCES).forEach(function(s) {
-                if(!Memory.roomData[r.name].sourceData[s.id]) {
-                    let c = PathFinder.search(s.pos,spawns[0].pos).path[0];
-                    Memory.roomData[r.name].sourceData[s.id] = {
-                        container: JSON.stringify({x:c.x,y:c.y,room:c.roomName}),
-                        harvester: ""
+            if(!Memory.roomData[r.name].sourceData) {
+                Memory.roomData[r.name].sourceData = {};
+                r.find(FIND_SOURCES).forEach(function(s) {
+                    if(!Memory.roomData[r.name].sourceData[s.id]) {
+                        let c = PathFinder.search(s.pos,spawns[0].pos).path[0];
+                        Memory.roomData[r.name].sourceData[s.id] = {
+                            container: JSON.stringify({x:c.x,y:c.y,room:c.roomName}),
+                            harvester: ""
+                        }
                     }
-                }
-            });
+                });
+            }
             tasks.forEach(function(task) { 
                 task.run(spawns); 
             });

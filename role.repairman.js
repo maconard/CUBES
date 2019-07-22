@@ -1,3 +1,4 @@
+let builder = require('role.builder');
 let priority = {
     [STRUCTURE_SPAWN]: 20,
     [STRUCTURE_CONTROLLER]: 19,
@@ -12,69 +13,62 @@ let priority = {
     [STRUCTURE_WALL]: 10
 }
 
-let upgrader = require('role.upgrader');
-let harvester = require('role.harvester');
-let builder = require('role.builder');
+let repairman = module.exports;
+repairman.run = function(creep) {
+    let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+    if(creep.memory.working && creep.carry.energy == 0) {
+        creep.memory.working = false;
+    }
+    if(!creep.memory.working && creep.carry.energy == creep.carryCapacity) {
+        creep.memory.working = true;
+    }
 
-let repairman =  {
-    run: function(creep) {
-        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-        if(creep.memory.working && creep.carry.energy == 0) {
-            creep.memory.working = false;
-        }
-        if(!creep.memory.working && creep.carry.energy == creep.carryCapacity) {
-            creep.memory.working = true;
-        }
-
-        if(creep.memory.working) {
-            // creep.say('repairing');
-            let targets = _.toArray(creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => {
-                    let dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
-                    let t = s.structureType;
-                    return (
-                            ((t == STRUCTURE_WALL || t == STRUCTURE_RAMPART) && s.hits < 50000) ||
-                            ((t != STRUCTURE_ROAD && t != STRUCTURE_WALL && 
-                                t != STRUCTURE_RAMPART) && s.hits < s.hitsMax) ||
-                            (t == STRUCTURE_ROAD && s.hits < s.hitsMax &&
-                            (Memory.roomData[creep.room.name].travelData[dat] > 15)));
-                }
-            })).sort((a,b) => priority[b.structureType] - priority[a.structureType]);
-            if(targets.length > 0) {
-                // console.log(targets[0].structureType);
-                if(creep.repair(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
-                }
-            } else {
-                builder.run(creep);
+    if(creep.memory.working) {
+        // creep.say('repairing');
+        let targets = _.toArray(creep.room.find(FIND_STRUCTURES, {
+            filter: (s) => {
+                let dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
+                let t = s.structureType;
+                return (
+                        ((t == STRUCTURE_WALL || t == STRUCTURE_RAMPART) && s.hits < 50000) ||
+                        ((t != STRUCTURE_ROAD && t != STRUCTURE_WALL && 
+                            t != STRUCTURE_RAMPART) && s.hits < s.hitsMax) ||
+                        (t == STRUCTURE_ROAD && s.hits < s.hitsMax &&
+                        (Memory.roomData[creep.room.name].travelData[dat] > 15)));
             }
-        }
-        else {
-            // creep.say('collecting');
-            global.util.pickupEnergyInRange(creep,15);
-
-            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (s) => {
-                    return ((s.structureType == STRUCTURE_CONTAINER || 
-                             s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50);
-                }
-            });
-            if(target){
-                if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});   
-                }
-            } else {
-                // harvester.run(creep);
-                creep.moveTo(spawn1.room.controller);
+        })).sort((a,b) => priority[b.structureType] - priority[a.structureType]);
+        if(targets.length > 0) {
+            // console.log(targets[0].structureType);
+            if(creep.repair(targets[0]) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
             }
+        } else {
+            builder.run(creep);
         }
-    },
-    base: [WORK,CARRY,MOVE],
-    add: {
-        0: { type: WORK, amt: 12 },
-        1: { type: CARRY, amt: 12 },
-        2: { type: MOVE, amt: 23 }
+    }
+    else {
+        // creep.say('collecting');
+        global.util.pickupEnergyInRange(creep,15);
+
+        let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (s) => {
+                return ((s.structureType == STRUCTURE_CONTAINER || 
+                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50);
+            }
+        });
+        if(target){
+            if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});   
+            }
+        } else {
+            // harvester.run(creep);
+            creep.moveTo(spawn1.room.controller);
+        }
     }
 };
-
-module.exports = repairman;
+repairman.base = [WORK,CARRY,MOVE];
+repairman.add = {
+    0: { type: WORK, amt: 12 },
+    1: { type: CARRY, amt: 12 },
+    2: { type: MOVE, amt: 23 }
+};

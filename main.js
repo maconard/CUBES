@@ -6,7 +6,7 @@ visuals = tasks[3];
 // delete Memory.roomData;
 if(!Memory.roomData) Memory.roomData = {};
 delete Memory.tickData;
-Memory.tickData = { time: new Date().getTime() / 1000, ticks: 0, rate: 0};
+Memory.tickData = { time: new Date().getTime() / 1000, ticks: 0, rate: "Calculating"};
 let main = module.exports; 
 
 main.loop = function() {

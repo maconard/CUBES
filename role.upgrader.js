@@ -45,13 +45,7 @@ let upgrader = {
         }
         else {
             // creep.say('collecting');
-            let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 7, {
-                    filter: (r) => r.resourceType == RESOURCE_ENERGY});
-            if(t.length > 25) {
-                creep.pickup(t[0])
-                creep.moveTo(t[0]);
-                return;
-            }
+            global.util.pickupEnergyInRange(creep,20);
             
             if(config.upgradeTarget != "" && creep.room.name == config.upgradeTarget) {
                 let source = creep.pos.findClosestByPath(FIND_SOURCES, {

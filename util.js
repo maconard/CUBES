@@ -61,6 +61,14 @@ let util = {
             "claimer-"+home,
             { memory: { home: home, role: "claimer", targetRoom: target } }
         );
+    },
+    pickupEnergyInRange(creep,range) {
+        let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range, {
+            filter: (r) => r.resourceType == RESOURCE_ENERGY});
+        if(t.length > 0 && t[0].amount > 25) {
+            creep.pickup(t[0])
+            creep.moveTo(t[0]);
+        }
     }
 };
 

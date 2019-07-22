@@ -16,13 +16,12 @@ let taskTowers = {
                     continue;
                 }
                 target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (s) => ((s.structureType == STRUCTURE_WALL || 
-                                    s.structureType == STRUCTURE_RAMPART) && s.hits < 1000) || 
-                                    ((s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART 
-                                        && s.structureType != STRUCTURE_ROAD) 
-                                    && s.hits < s.hitsMax) ||
-                                    (s.structureType == STRUCTURE_ROAD 
-                                        && Memory.roomData[tower.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20)
+                    filter: (s) => (
+                        (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < 1000) || 
+                        ((s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART && 
+                            s.structureType != STRUCTURE_ROAD) && s.hits < s.hitsMax) ||
+                        (s.structureType == STRUCTURE_ROAD && 
+                            Memory.roomData[tower.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20)
                 });
                 if(target) {
                     tower.repair(target);

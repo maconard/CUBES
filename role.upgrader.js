@@ -26,7 +26,7 @@ upgrader.run = function(creep) {
             }
             if(target) {
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(target);
                 }
                 return;
             }
@@ -38,7 +38,7 @@ upgrader.run = function(creep) {
             }
         }
         if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+            creep.moveTo(creep.room.controller);
         }
     }
     else {
@@ -52,7 +52,7 @@ upgrader.run = function(creep) {
                 }
             });
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+                if(creep.moveTo(source) == ERR_NO_PATH) {
                 }
             }
             return;
@@ -63,7 +63,7 @@ upgrader.run = function(creep) {
                             s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50});
         if(target) {
             if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.moveTo(target);
             }
         } else {
             creep.moveTo(spawn1);

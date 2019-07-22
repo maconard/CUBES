@@ -18,7 +18,7 @@ harvester.run = function(creep) {
                 return (s.energy > 0);
             }});
         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+            if(creep.moveTo(source) == ERR_NO_PATH) {
             }
         }
     } else { //depositing energy
@@ -33,11 +33,11 @@ harvester.run = function(creep) {
                                     creep.pos.getRangeTo(s) < 30)});
         if(target) {
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                creep.moveTo(target);
             }
         } else {
             if(creep.transfer(spawn1, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn1, {visualizePathStyle: {stroke: '#ff0000 '}});
+                creep.moveTo(spawn1);
             }
         }
     }

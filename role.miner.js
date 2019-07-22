@@ -22,7 +22,7 @@ miner.run = function(creep) {
         }
         let source = creep.pos.findClosestByPath(FIND_MINERALS);
         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-            if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+            if(creep.moveTo(source) == ERR_NO_PATH) {
             }
         }
     } else { //depositing minerals
@@ -36,7 +36,7 @@ miner.run = function(creep) {
                 let hold = _.sum(creep.carry);
                 if(amt > hold) amt = hold;
                 if(creep.transfer(target, r, amt) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(target);
                 }
             });
         }

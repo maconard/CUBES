@@ -40,7 +40,7 @@ repairman.run = function(creep) {
         if(targets.length > 0) {
             // console.log(targets[0].structureType);
             if(creep.repair(targets[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
+                creep.moveTo(targets[0]);
             }
         } else {
             builder.run(creep);
@@ -58,7 +58,7 @@ repairman.run = function(creep) {
         });
         if(target){
             if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});   
+                creep.moveTo(target);   
             }
         } else {
             // harvester.run(creep);

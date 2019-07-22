@@ -33,7 +33,7 @@ builder.run = function(creep) {
         }
         if(target) {
             if(creep.build(target) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                creep.moveTo(target);
             }
         } else {
             upgrader.run(creep);
@@ -50,7 +50,7 @@ builder.run = function(creep) {
                 }
             });
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                if(creep.moveTo(source,{visualizePathStyle: {stroke: '#ffaa00'}}) == ERR_NO_PATH) {
+                if(creep.moveTo(source) == ERR_NO_PATH) {
                 }
             }
             return;
@@ -66,7 +66,7 @@ builder.run = function(creep) {
         if(target) {
             let x = creep.withdraw(target, RESOURCE_ENERGY);
             if(x == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.moveTo(target);
             }       
         } else {
             creep.moveTo(spawn1);

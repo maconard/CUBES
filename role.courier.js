@@ -67,8 +67,8 @@ let courier =  {
             //     return;
             // }
 
-            global.util.pickupEnergyInRange(creep,30);
-            
+            global.util.pickupEnergyInRange(creep,40);
+
             let source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
                     && s.store[RESOURCE_ENERGY] > 50)});   

@@ -69,7 +69,7 @@ let builder =  {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }       
             } else {
-                creep.moveTo(spawn1.room.controller);
+                creep.moveTo(spawn1);
             }
         }
     },

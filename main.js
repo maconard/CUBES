@@ -1,8 +1,8 @@
 tasks = [require('task.creeps'), require('task.towers'), 
-         require('task.manage'), require('task.visuals')];
+         require('task.manage'), require('task.market'), require('task.visuals')];
 garbage = require('task.garbage');
 global.util = require('util');
-visuals = tasks[3];
+visuals = tasks[4];
 // delete Memory.roomData;
 if(!Memory.roomData) Memory.roomData = {};
 delete Memory.tickData;

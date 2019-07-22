@@ -57,7 +57,7 @@ courier.run = function(creep) {
     } else { 
         creep.say("gathering");
 
-        global.util.pickupEnergyInRange(creep,40);
+        if(global.util.pickupEnergyInRange(creep,40)) return;
 
         let source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 

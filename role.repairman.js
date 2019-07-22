@@ -48,7 +48,7 @@ repairman.run = function(creep) {
     }
     else {
         // creep.say('collecting');
-        global.util.pickupEnergyInRange(creep,15);
+        if(global.util.pickupEnergyInRange(creep,15)) return;
 
         let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (s) => {

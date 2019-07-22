@@ -66,7 +66,9 @@ util.pickupEnergyInRange = function(creep,range) {
     if(t.length > 0 && t[0].amount > 25) {
         creep.pickup(t[0])
         creep.moveTo(t[0]);
+        return true;
     }
+    return false;
 };
 util.getDate = function() {
     let offset = -5;

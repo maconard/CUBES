@@ -27,17 +27,17 @@ miner.run = function(creep) {
         }
     } else { //depositing minerals
         // creep.say("depositing");
-        let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_TERMINAL
-                                && _.sum(s.store) < 290000) });
-        if(target) {
+        let term = spawn1.room.terminal;
+        if(term && _.sum(term.store) - term.store[RESOURCE_ENERGY] >= 280000)
+            term = false;
+        if(term) {
             let hold = _.sum(creep.carry);
-            let amt = 290000 - _.sum(target.store);
+            let amt = 280000 - _.sum(term.store);
             if(amt > hold) amt = hold;
             for(let r in creep.carry) {
-                let result = creep.transfer(target, r, amt);
+                let result = creep.transfer(term, r, amt);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target);
+                    creep.moveTo(term);
                 } else if(result == OK) {
                     break;
                 }
@@ -47,8 +47,7 @@ miner.run = function(creep) {
 };
 miner.base = [WORK,CARRY,MOVE];
 miner.add = {
-    0: { type: WORK, amt: 5},
-    1: { type: WORK, amt: 5},
-    2: { type: CARRY, amt: 3},
-    3: { type: MOVE, amt: 4}
+    0: { type: WORK, amt: 7},
+    1: { type: CARRY, amt: 3},
+    2: { type: MOVE, amt: 5}
 };

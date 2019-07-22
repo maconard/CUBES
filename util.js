@@ -47,14 +47,20 @@ util.getDate = function() {
     return new Date( new Date().getTime() + offset * 3600 * 1000).toUTCString().replace('GMT', 'CST' ); 
 };
 util.fixTerminals = function(spawn1,creep) {
-    if(spawn1.room.terminal && _.sum(spawn1.room.terminal.store) > 290000) {
-        for(let rss in spawn1.room.terminal.store) {
-            if(creep.withdraw(spawn1.room.terminal, rss, _.sum(spawn1.room.terminal.store) - 290000) != OK) {
-                creep.moveTo(spawn1.room.terminal);
+    let term = spawn1.room.terminal;
+    if(term && (_.sum(term.store) > 280000)) {
+        for(let rss in term.store) {
+            if(rss == RESOURCE_ENERGY) continue;
+            let take =  _.sum(term.store) - 280000;
+            if(take > creep.carryCapacity) take = creep.carryCapacity;
+            if(creep.withdraw(term, rss, take) != OK) {
+                creep.moveTo(term);
             } 
             creep.drop(rss);
         }
+        return true;
     }
+    return false;
 }
 util.getSum = function(arr,attr="amt") {
     let sum = 0;

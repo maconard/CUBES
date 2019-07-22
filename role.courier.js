@@ -55,7 +55,8 @@ courier.run = function(creep) {
             creep.moveTo(spawn1.room.controller);
         }
     } else { 
-        creep.say("gathering");
+        // creep.say("gathering");
+        // if(global.util.fixTerminals(spawn1,creep)) return;
 
         if(global.util.pickupEnergyInRange(creep,40)) return;
 

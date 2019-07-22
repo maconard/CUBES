@@ -81,7 +81,7 @@ taskCreeps.emergency = function(spawns, roles) {
     else if(roles.upgrader.num == 0)
         return this.spawn(spawns,roles, 'upgrader') == OK;
     else if(roles.guard.num < 1 && hostiles > 0)
-            return this.spawn(spawns,roles, 'guard') == OK;
+        return this.spawn(spawns,roles, 'guard') == OK;
     return false;
 };
 taskCreeps.spawning = function(spawns, roles, cLevel) {
@@ -97,13 +97,12 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
     };
     if(quit) return;
     let extractors = spawns[0].room.find(FIND_STRUCTURES, {
-        filter: (structure) => {
-            return (structure.structureType == STRUCTURE_EXTRACTOR);
-        }}).length;
+        filter: (s) => { return (s.structureType == STRUCTURE_EXTRACTOR); }
+    }).length;
     let mineral = spawns[0].room.find(FIND_MINERALS);
+    let term = (spawns[0].room.terminal ? _.sum(spawns[0].room.terminal.store) : 300000);
     if(mineral.length > 0 && mineral[0].mineralAmount > 0) mineral = true;
     else mineral = false;
-    let term = (spawns[0].room.terminal ? _.sum(spawns[0].room.terminal.store) : 300000);
     if(roles.miner.num < roles.miner.max && extractors > 0 && mineral && term < 300000) {
         this.spawn(spawns,roles, 'miner');
     }      
@@ -141,7 +140,7 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
         Memory.cache.bodies[role] = JSON.stringify(pool);
     }
 
-    let nrg = bodyCost(body);
+    let nrg = global.util.bodyCost(body);
     if(!energy) energy = config.spawnEnergy[spawns[0].room.controller.level];
     let j = 0;
     while(nrg < spawns[0].room.energyAvailable && nrg < energy && j < pool.length) {
@@ -211,7 +210,6 @@ taskCreeps.log = function(spawn1,roles) {
     }
     if(spawn1.room.storage)
         contained += spawn1.room.storage.store[RESOURCE_ENERGY];
-    // ticks[spawn1.room.name]++;
     let x = spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; " + 
         roles.harvester.num + " H, " + roles.builder.num + " B, " + roles.upgrader.num + 
         " U, " + roles.repairman.num + " R, " + roles.courier.num + " C, " + roles.guard.num + " G, " + 

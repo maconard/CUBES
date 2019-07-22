@@ -43,6 +43,7 @@ taskManage.run = function(spawns) {
         this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
         this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
         this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
+        this.remove(spawn1, STRUCTURE_ROAD, 'roads');
     }
 };
 taskManage.plan = function(spawn1, stype, eng, ptype) {
@@ -128,6 +129,19 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             tgt = m.pos;
             attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
         });
+    }
+};
+taskManage.remove = function(spawn1,stype,eng) {
+    let r = spawn1.room;
+    let sites = r.find(FIND_CONSTRUCTION_SITES, {
+            filter: (s) => {
+                let dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
+                let t = s.structureType;
+                return (t === stype && !Memory.roomData[r.name].travelData[dat]);
+            }
+    });
+    for(let i = 0; i < sites.length; i++) {
+        sites[i].remove();
     }
 };
 

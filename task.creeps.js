@@ -30,20 +30,6 @@ let cost = {
     [CLAIM]: 600
 }
 
-function bodyCost (body) {
-    return body.reduce(function(cost, part) {
-        return cost + BODYPART_COST[part];
-    }, 0);
-};
-
-function getSum(arr,attr="amt") {
-    let sum = 0;
-    Object.keys(arr).forEach(function(b) {
-        sum += arr[b][attr];
-    });   
-    return sum; 
-};
-
 if(!Memory.cache) Memory.cache = {};
 if(!Memory.role_ids) Memory.role_ids = {};
 Memory.cache.bodies = {};
@@ -103,12 +89,13 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
     let that = this;
     let quit = false;
     for(let k in roles) {
-        if(k == 'invader' || k == 'miner' || quit) return;
+        if(k == 'invader' || k == 'miner' || quit) continue;
         if(roles[k].num < roles[k].max) {
             if(that.spawn(spawns,roles, k) == OK)
             quit = true;
         }
     };
+    if(quit) return;
     let extractors = spawns[0].room.find(FIND_STRUCTURES, {
         filter: (structure) => {
             return (structure.structureType == STRUCTURE_EXTRACTOR);
@@ -120,7 +107,7 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
     if(roles.miner.num < roles.miner.max && extractors > 0 && mineral && term < 300000) {
         this.spawn(spawns,roles, 'miner');
     }      
-    if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 5000) {
+    else if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 5000) {
         this.spawn(spawns,roles, 'invader',false,6000);
     }        
 };
@@ -140,7 +127,7 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
             used = {[TOUGH]:0,[WORK]:0,[CARRY]:0,[MOVE]:0,[HEAL]:0,[CLAIM]:0,[ATTACK]:0,[RANGED_ATTACK]:0},
             i = 0,
             len = _.toArray(a).length,
-            sum = getSum(a),
+            sum = global.util.getSum(a),
             parts = 0;
         while(parts <= sum && i < 300) {
             let at = i % len;

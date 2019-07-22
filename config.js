@@ -1,7 +1,7 @@
 module.exports = {
     buildTarget: "",
     upgradeTarget: "",
-    spawnEnergy: { 0: 300, 1: 500, 2: 800, 3: 800, 4: 850, 5: 850, 6: 900, 7: 950, 8: 1000},
+    spawnEnergy: { 0: 300, 1: 500, 2: 800, 3: 800, 4: 850, 5: 900, 6: 950, 7: 1050, 8: 1150},
     count: {
         override: {
             MAX_HARVESTER:      0,
@@ -71,7 +71,7 @@ module.exports = {
             MAX_COURIER:        3,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,
-            MAX_MINER:          0
+            MAX_MINER:          1
         },
         7: {
             MAX_HARVESTER:      2,

@@ -41,7 +41,7 @@ builder.run = function(creep) {
     }
     else { //harvesting or collecting energy\
         // creep.say('collecting');
-        if(global.util.pickupEnergyInRange(creep,20)) return;
+        if(global.util.pickupEnergyInRange(creep,10)) return;
 
         if(config.buildTarget != "" && creep.room.name == config.buildTarget) {
             let source = creep.pos.findClosestByPath(FIND_SOURCES, {

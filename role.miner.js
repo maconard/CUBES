@@ -31,14 +31,17 @@ miner.run = function(creep) {
                 filter: (s) => (s.structureType == STRUCTURE_TERMINAL
                                 && _.sum(s.store) < 290000) });
         if(target) {
-            Object.keys(creep.carry).forEach(function(r) {
-                let amt = 290000 - _.sum(target.store);
-                let hold = _.sum(creep.carry);
-                if(amt > hold) amt = hold;
-                if(creep.transfer(target, r, amt) == ERR_NOT_IN_RANGE) {
+            let hold = _.sum(creep.carry);
+            let amt = 290000 - _.sum(target.store);
+            if(amt > hold) amt = hold;
+            for(let r in creep.carry) {
+                let result = creep.transfer(target, r, amt);
+                if(result == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
+                } else if(result == OK) {
+                    break;
                 }
-            });
+            }
         }
     }
 };

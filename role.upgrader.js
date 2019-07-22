@@ -43,7 +43,7 @@ upgrader.run = function(creep) {
     }
     else {
         // creep.say('collecting');
-        if(global.util.pickupEnergyInRange(creep,20)) return;
+        if(global.util.pickupEnergyInRange(creep,10)) return;
         
         if(config.upgradeTarget != "" && creep.room.name == config.upgradeTarget) {
             let source = creep.pos.findClosestByPath(FIND_SOURCES, {

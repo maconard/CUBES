@@ -1,9 +1,9 @@
-var harvester =  {
+let harvester =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
 
         // if(!creep.memory.source) {
-        //     var sources = spawn.room.find(FIND_SOURCES);
+        //     let sources = spawn.room.find(FIND_SOURCES);
         //     sources.forEach(function(s) {
         //         if(!Memory.roomData[creep.room.name].sourceData) Memory.roomData[creep.room.name].sourceData = {};
         //         if(!Memory.roomData[creep.room.name].sourceData[s.id]) Memory.roomData[creep.room.name].sourceData[s.id] = {count: 0};
@@ -12,8 +12,8 @@ var harvester =  {
         // }
 
         if(creep.carry.energy < creep.carryCapacity || creep.carryCapacity == 0) {
-            creep.say("harvesting");
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, {
+            // creep.say("harvesting");
+            let source = creep.pos.findClosestByPath(FIND_SOURCES, {
                 filter: (s) => {
                     return (s.energy > 0);
                 }});
@@ -22,8 +22,8 @@ var harvester =  {
                 }
             }
         } else { //depositing energy
-            creep.say("depositing");
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            // creep.say("depositing");
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => (
                                   (((s.structureType == STRUCTURE_CONTAINER ||  
                                      s.structureType == STRUCTURE_STORAGE) && 

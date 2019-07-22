@@ -1,15 +1,15 @@
-var harvester = require('role.harvester');
-var builder = require('role.builder');
-var upgrader = require('role.upgrader');
-var repairman = require('role.repairman');
-var courier = require('role.courier');
-var guard = require('role.guard');
-var invader = require('role.invader');
-var claimer = require('role.claimer');
-var miner = require('role.miner');
-var config = require('config');
+let harvester = require('role.harvester');
+let builder = require('role.builder');
+let upgrader = require('role.upgrader');
+let repairman = require('role.repairman');
+let courier = require('role.courier');
+let guard = require('role.guard');
+let invader = require('role.invader');
+let claimer = require('role.claimer');
+let miner = require('role.miner');
+let config = require('config');
         
-var priority = {
+let priority = {
     [TOUGH]: 10,
     [CARRY]: 9,
     [WORK]: 8,
@@ -20,7 +20,7 @@ var priority = {
     [CLAIM]: 3
 };
 
-var cost = {
+let cost = {
     [TOUGH]: 10,
     [CARRY]: 50,
     [WORK]: 100,
@@ -38,27 +38,27 @@ function bodyCost (body) {
 };
 
 function getSum(arr,attr="") {
-    var sum = 0;
+    let sum = 0;
     Object.keys(arr).forEach(function(b) {
         sum += arr[b].amt;
     });   
     return sum; 
 };
     
-var taskCreeps = {
+let taskCreeps = {
     run: function(spawns) {
-        var spawn1 = spawns[0];
+        let spawn1 = spawns[0];
         if(!spawn1.room.controller || !spawn1.room.controller.my) return;
         
         // Init Roles
-        var cLevel = spawn1.room.controller.level;
-        var roles = this.init(cLevel);
+        let cLevel = spawn1.room.controller.level;
+        let roles = this.init(cLevel);
             
         //Run Creep Roles
         roles = this.creeping(spawn1, roles);
     
         //Emergency Spawning
-        var emg = this.emergency(spawns, roles);
+        let emg = this.emergency(spawns, roles);
     
         //Normal Spawning
         if(!emg)
@@ -68,17 +68,17 @@ var taskCreeps = {
         this.log(spawn1,roles);
     },
     creeping: function(spawn1, roles) {
-        var roomCreeps = _.filter(Game.creeps, c => c.memory.home == spawn1.room.name);
-        for(var c in roomCreeps) {
-            var creep = Game.creeps[roomCreeps[c].name];
+        let roomCreeps = _.filter(Game.creeps, c => c.memory.home == spawn1.room.name);
+        for(let c in roomCreeps) {
+            let creep = Game.creeps[roomCreeps[c].name];
             roles[creep.memory.role].job.run(creep);
             roles[creep.memory.role].num++;
         }
         return roles;
     },
     emergency: function(spawns, roles) {
-        var hostiles = spawns[0].room.find(FIND_HOSTILE_CREEPS).length;
-        if(roles.guard.num < 2 && hostiles > 0)
+        let hostiles = spawns[0].room.find(FIND_HOSTILE_CREEPS).length;
+        if(roles.guard.num < 1 && hostiles > 0)
             return this.spawn(spawns,roles, 'guard') == OK;
         else if(roles.harvester.num == 0)
             return this.spawn(spawns,roles, 'harvester') == OK;
@@ -89,9 +89,9 @@ var taskCreeps = {
         return false;
     },
     spawning: function(spawns, roles, cLevel) {
-        var tLevel = cLevel;
-        var that = this;
-        var quit = false;
+        let tLevel = cLevel;
+        let that = this;
+        let quit = false;
         Object.keys(roles).forEach(function(k) {
             if(k == 'invader' || k == 'miner' || quit) return;
             if(roles[k].num < roles[k].max) {
@@ -99,15 +99,16 @@ var taskCreeps = {
                 quit = true;
             }
         });
-        var extractors = spawns[0].room.find(FIND_STRUCTURES, {
+        let extractors = spawns[0].room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType == STRUCTURE_EXTRACTOR);
             }}).length;
-        var mineral = spawns[0].room.find(FIND_MINERALS);
+        let mineral = spawns[0].room.find(FIND_MINERALS);
         if(mineral.length > 0 && mineral[0].mineralAmount > 0) mineral = true;
         else mineral = false;
+        let term = (spawns[0].room.terminal ? _.sum(spawns[0].room.terminal.store) : 300000);
 
-        if(roles.miner.num < roles.miner.max && extractors > 0 && mineral) {
+        if(roles.miner.num < roles.miner.max && extractors > 0 && mineral && term < 300000) {
             this.spawn(spawns,roles, 'miner');
         }      
         if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 5000) {
@@ -122,22 +123,22 @@ var taskCreeps = {
             Memory.role_ids[role] = 1;
         }
         
-        var body;
+        let body;
         if(override) {
             body = override;
         } else {
             body = JSON.parse(JSON.stringify(roles[role].job.base));
-            var a = roles[role].job.add,
+            let a = roles[role].job.add,
                 nrg = bodyCost(body),
                 used = {[TOUGH]:0,[WORK]:0,[CARRY]:0,[MOVE]:0,[HEAL]:0,[CLAIM]:0,[ATTACK]:0,[RANGED_ATTACK]:0},
                 i = 0,
                 len = _.toArray(a).length;
             if(!energy) energy = config.spawnEnergy[spawns[0].room.controller.level];
-            var sum = getSum(a);
-            var parts = 0;
+            let sum = getSum(a);
+            let parts = 0;
             while((nrg <= spawns[0].room.energyAvailable && nrg <= energy) && (parts < sum) && (i < 300)) {
-                var at = i % len;
-                var x = a[at].type;
+                let at = i % len;
+                let x = a[at].type;
                 if(used[x] >= a[at].amt) { i++; continue; }
                 if(nrg + cost[x] > spawns[0].room.energyAvailable) break;
                 parts++;
@@ -149,10 +150,10 @@ var taskCreeps = {
         }
         
         body = body.sort((a,b) => priority[b] - priority[a]);
-        var birthData = {memory: {role: role, working: false, home: spawns[0].room.name}};
-        var name = role + '-' + Memory.role_ids[role];
-        var result = spawns[0].spawnCreep(body, name, birthData);
-        var i = 1;
+        let birthData = {memory: {role: role, working: false, home: spawns[0].room.name}};
+        let name = role + '-' + Memory.role_ids[role];
+        let result = spawns[0].spawnCreep(body, name, birthData);
+        let i = 1;
         while(result == ERR_BUSY && i < spawns.length) {
             result = spawns[i].spawnCreep(body, name, birthData);
             i++;
@@ -172,7 +173,7 @@ var taskCreeps = {
         }
     },
     init: function(cLevel) {
-        var roles = {
+        let roles = {
             harvester: {job: harvester, num: 0},
             builder: {job: builder, num: 0},
             upgrader: {job: upgrader, num: 0},
@@ -195,18 +196,18 @@ var taskCreeps = {
         return roles;
     },
     log: function(spawn1,roles) {
-        var contained = 0;
-        var containers = spawn1.room.find(FIND_STRUCTURES, {
+        let contained = 0;
+        let containers = spawn1.room.find(FIND_STRUCTURES, {
             filter: (s) => (s.structureType == STRUCTURE_CONTAINER)});
         if(containers.length > 0) {
-            for(var x = 0; x < containers.length; x++) {
+            for(let x = 0; x < containers.length; x++) {
                 contained += containers[x].store[RESOURCE_ENERGY];
             }
         }
         if(spawn1.room.storage)
             contained += spawn1.room.storage.store[RESOURCE_ENERGY];
         // ticks[spawn1.room.name]++;
-        var x = spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; " + 
+        let x = spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; " + 
             roles.harvester.num + " H, " + roles.builder.num + " B, " + roles.upgrader.num + 
             " U, " + roles.repairman.num + " R, " + roles.courier.num + " C, " + roles.guard.num + " G, " + 
             roles.miner.num + " M, " + roles.invader.num + " I";

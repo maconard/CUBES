@@ -1,19 +1,19 @@
 config = require('config');
 
-var guard =  {
+let guard =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-        var controller = Game.rooms[creep.memory.home].controller;
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let controller = Game.rooms[creep.memory.home].controller;
         
         // if(true){//config.targetRoom) {
-        //     var targetRoom = 'W5N3';//config.targetRoom;
+        //     let targetRoom = 'W5N3';//config.targetRoom;
         //     if(!(creep.room.name == targetRoom)) {
         //         creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetRoom)));
         //         return;
         //     }
         // }
         
-        var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
         if(target) {
             creep.say('die!');
             if(creep.attack(target) != OK && creep.rangedAttack(target) != OK) {

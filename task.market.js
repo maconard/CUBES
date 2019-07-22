@@ -1,6 +1,6 @@
-var taskManage = {
+let taskManage = {
     run: function(spawns) {
-        var spawn1 = spawns[0];
+        let spawn1 = spawns[0];
     }
 };
 

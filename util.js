@@ -1,4 +1,4 @@
-var priority = {
+let priority = {
     [TOUGH]: 10,
     [CARRY]: 9,
     [WORK]: 8,
@@ -8,7 +8,7 @@ var priority = {
     [HEAL]: 4,
     [CLAIM]: 3
 };
-var cost = {
+let cost = {
     [TOUGH]: 10,
     [CARRY]: 50,
     [WORK]: 100,
@@ -26,26 +26,26 @@ function bodyCost (body) {
 };
 
 function getSum(arr,attr="") {
-    var sum = 0;
+    let sum = 0;
     Object.keys(arr).forEach(function(b) {
         sum += arr[b].amt;
     });   
     return sum; 
 };
 
-var util = {
+let util = {
     dynamicallyBuildBody: function(roles,role,energy) {
-        var body = JSON.parse(JSON.stringify(roles[role].job.base)),
+        let body = JSON.parse(JSON.stringify(roles[role].job.base)),
             a = roles[role].job.add,
             nrg = bodyCost(body),
             used = {[TOUGH]:0,[WORK]:0,[CARRY]:0,[MOVE]:0,[HEAL]:0,[CLAIM]:0,[ATTACK]:0,[RANGED_ATTACK]:0},
             i = 0,
             len = _.toArray(a).length;
         
-        var sum = getSum(a);
+        let sum = getSum(a);
         while((nrg <= energy) && (i < sum)) {
-            var at = i % len;
-            var x = a[at].type;
+            let at = i % len;
+            let x = a[at].type;
             if(used[x] >= a[at].amt) { i++; continue; }
             if(nrg + cost[x] > energy) break;
             body.push(x);

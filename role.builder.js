@@ -1,9 +1,9 @@
-var upgrader = require('role.upgrader');
-var config = require('config');
+let upgrader = require('role.upgrader');
+let config = require('config');
 
-var builder =  {
+let builder =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
         if(creep.memory.working && creep.carry.energy == 0) {
             creep.memory.working = false;
         }
@@ -12,16 +12,16 @@ var builder =  {
         }
 
         if(creep.memory.working) {
-            creep.say('building');
+            // creep.say('building');
             if(config.buildTarget != "" && spawn1.room.controller.level > 6) {
-                var targetRoom = config.buildTarget;
+                let targetRoom = config.buildTarget;
                 if(!(creep.room.name == targetRoom)) {
                     creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetRoom)));
                     return;
                 }
             }
             
-            var target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
+            let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_EXTENSION || 
                     structure.structureType == STRUCTURE_RAMPART ||
@@ -40,17 +40,17 @@ var builder =  {
             }
         }
         else { //harvesting or collecting energy\
-            creep.say('collecting');
-            var t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 7, {
+            // creep.say('collecting');
+            let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 7, {
                     filter: (r) => r.resourceType == RESOURCE_ENERGY});
-            if(t.length > 0) {
+            if(t.length > 25) {
                 creep.pickup(t[0])
                 creep.moveTo(t[0]);
                 return;
             }
 
             if(config.buildTarget != "" && creep.room.name == config.buildTarget) {
-                var source = creep.pos.findClosestByPath(FIND_SOURCES, {
+                let source = creep.pos.findClosestByPath(FIND_SOURCES, {
                     filter: (s) => {
                         return s.room.name == config.buildTarget;
                     }
@@ -62,15 +62,15 @@ var builder =  {
                 return;
             }
 
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return ((structure.structureType == STRUCTURE_CONTAINER || 
                             structure.structureType == STRUCTURE_STORAGE) && 
-                            structure.store[RESOURCE_ENERGY] > 0);
+                            structure.store[RESOURCE_ENERGY] > 50);
                 }
             });
             if(target) {
-                var x = creep.withdraw(target, RESOURCE_ENERGY);
+                let x = creep.withdraw(target, RESOURCE_ENERGY);
                 if(x == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }       
@@ -83,9 +83,9 @@ var builder =  {
     add: {
         0: { type: WORK, amt: 12 },
         1: { type: CARRY, amt: 12 },
-        2: { type: MOVE, amt: 23 },
-        3: { type: TOUGH, amt: 5 },
-        4: { type: TOUGH, amt: 5 }
+        2: { type: MOVE, amt: 23 }
+        // 3: { type: TOUGH, amt: 5 },
+        // 4: { type: TOUGH, amt: 5 }
     }
 };
 

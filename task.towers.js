@@ -1,19 +1,19 @@
-var taskTowers = {
+let taskTowers = {
     run: function(spawns) {
-        var spawn1 = spawns[0];
-        var towers = _.filter(Game.structures, s => s.structureType == STRUCTURE_TOWER && s.room == spawn1.room);
-        for(var tower of towers) {
+        let spawn1 = spawns[0];
+        let towers = _.filter(Game.structures, (s) => (s.structureType == STRUCTURE_TOWER && s.room.name == spawn1.room.name));
+        for(let tower of towers) {
             if(tower.energy >= 10) {
-                var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+                let target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
                 if(target) {
                     tower.attack(target);
-                    return;
+                    continue;
                 }
                 target = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
                     filter: (c) => (c.hits < c.hitsMax)});
                 if(target) {
                     tower.heal(target);
-                    return;
+                    continue;
                 }
                 target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (s) => ((s.structureType == STRUCTURE_WALL || 
@@ -22,11 +22,11 @@ var taskTowers = {
                                         && s.structureType != STRUCTURE_ROAD) 
                                     && s.hits < s.hitsMax) ||
                                     (s.structureType == STRUCTURE_ROAD 
-                                        && Memory.roomData[tower.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 30)
+                                        && Memory.roomData[tower.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20)
                 });
                 if(target) {
                     tower.repair(target);
-                    return;
+                    continue;
                 }
             }
         }

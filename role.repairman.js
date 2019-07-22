@@ -1,4 +1,4 @@
-var priority = {
+let priority = {
     [STRUCTURE_SPAWN]: 20,
     [STRUCTURE_CONTROLLER]: 19,
     [STRUCTURE_EXTENSION]: 18,
@@ -12,13 +12,13 @@ var priority = {
     [STRUCTURE_WALL]: 10
 }
 
-var upgrader = require('role.upgrader');
-var harvester = require('role.harvester');
-var builder = require('role.builder');
+let upgrader = require('role.upgrader');
+let harvester = require('role.harvester');
+let builder = require('role.builder');
 
-var repairman =  {
+let repairman =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
         if(creep.memory.working && creep.carry.energy == 0) {
             creep.memory.working = false;
         }
@@ -27,11 +27,11 @@ var repairman =  {
         }
 
         if(creep.memory.working) {
-            creep.say('repairing');
-            var targets = _.toArray(creep.room.find(FIND_STRUCTURES, {
+            // creep.say('repairing');
+            let targets = _.toArray(creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    var dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
-                    var t = s.structureType;
+                    let dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
+                    let t = s.structureType;
                     return (((t == STRUCTURE_WALL || t == STRUCTURE_RAMPART) && s.hits < 50000) ||
                             ((t != STRUCTURE_ROAD && t != STRUCTURE_WALL && 
                                 t != STRUCTURE_RAMPART) && s.hits < s.hitsMax) ||
@@ -48,15 +48,15 @@ var repairman =  {
             }
         }
         else {
-            creep.say('collecting');
-            var t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 7, {
+            // creep.say('collecting');
+            let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 7, {
                     filter: (r) => r.resourceType == RESOURCE_ENERGY});
-            if(t.length > 0) {
+            if(t.length > 25) {
                 creep.pickup(t[0])
                 creep.moveTo(t[0]);
                 return;
             }
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => {
                     return ((s.structureType == STRUCTURE_CONTAINER || 
                              s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50);

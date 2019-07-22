@@ -1,7 +1,7 @@
-var rangeharvester =  {
+let rangeharvester =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-        var energy = creep.pos.findInRange(FIND_DROPPED_RESOURCES,1);
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let energy = creep.pos.findInRange(FIND_DROPPED_RESOURCES,1);
         if (energy.length) {
             creep.pickup(energy[0]);
         }
@@ -14,9 +14,9 @@ var rangeharvester =  {
             if(typeof(creep.memory.opt) == 'undefined') {
                 creep.memory.opt = 1;
             }
-            var flag = 'farSource' + creep.memory.opt;
+            let flag = 'farSource' + creep.memory.opt;
             creep.moveTo(Game.flags[flag]);
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
+            let source = creep.pos.findClosestByPath(FIND_SOURCES);
             if(source) {
                 creep.harvest(source);
             }
@@ -29,17 +29,17 @@ var rangeharvester =  {
                     creep.upgradeController(creep.room.controller);
                 creep.moveTo(Game.rooms['E99N62'].controller);
             } else {
-                var target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+                let target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                     filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] < s.storeCapacity)});
                 if(target) {
-                    var result = creep.transfer(target, RESOURCE_ENERGY);
+                    let result = creep.transfer(target, RESOURCE_ENERGY);
                     if(result == ERR_NOT_IN_RANGE) {
                         creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
                     } else if(result == OK) {
                         if(typeof(Memory.rangeHarvesters) == 'undefined') {
                             Memory.rangeHarvesters = {};
                         }
-                        var name = creep.name;
+                        let name = creep.name;
                         if(typeof(Memory.rangeHarvesters[name]) == 'undefined') {
                             Memory.rangeHarvesters[name] = creep.carryCapacity;
                         } else {
@@ -47,14 +47,14 @@ var rangeharvester =  {
                         }
                     }
                 } else {
-                    var result = creep.transfer(spawn1, RESOURCE_ENERGY);
+                    let result = creep.transfer(spawn1, RESOURCE_ENERGY);
                     if(result == ERR_NOT_IN_RANGE) {
                         creep.moveTo(spawn1, {visualizePathStyle: {stroke: '#ff0000 '}});
                     } else if(result == OK) {
                         if(typeof(Memory.rangeHarvesters) == 'undefined') {
                             Memory.rangeHarvesters = {};
                         }
-                        var name = creep.name;
+                        let name = creep.name;
                         if(typeof(Memory.rangeHarvesters[name]) == 'undefined') {
                             Memory.rangeHarvesters[name] = creep.carryCapacity;
                         } else {

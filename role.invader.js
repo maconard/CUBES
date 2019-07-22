@@ -1,9 +1,9 @@
-var invader =  {
+let invader =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-        var targetRoom = 'W4N4';
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let targetRoom = 'W4N4';
         if(creep.room.name == targetRoom) {
-            var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+            let target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
             if(target) {
                 creep.say('die!!');
                 if(creep.rangedAttack(target) != OK && creep.attack(target) != OK) {
@@ -34,7 +34,7 @@ var invader =  {
                 }
             }
         } else {
-            var h = creep.pos.findInRange(FIND_HOSTILE_CREEPS,5);
+            let h = creep.pos.findInRange(FIND_HOSTILE_CREEPS,5);
             if(h.length) {
                 creep.say('die!!');
                 h = h[0];

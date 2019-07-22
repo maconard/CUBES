@@ -1,6 +1,6 @@
-var courier =  {
+let courier =  {
     run: function(creep) {
-        var spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
+        let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
         if(creep.memory.working && creep.carry.energy == 0) {
             creep.memory.working = false;
         }
@@ -9,8 +9,8 @@ var courier =  {
         }
         
         if(creep.memory.working) {//depositing energy
-            creep.say("supplying");
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            // creep.say("supplying");
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => {
                         return (s.structureType == STRUCTURE_SPAWN || 
                             s.structureType == STRUCTURE_TOWER ||
@@ -19,10 +19,19 @@ var courier =  {
             });
             if(target) {
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(target);
                 } 
                 return;
             }
+
+            let term = creep.room.terminal;
+            if(term && _.sum(term.store) < 300000 && term.store[RESOURCE_ENERGY] < 10000) {
+                if(creep.transfer(term, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(term);
+                } 
+                return;
+            }
+
             target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => {
                         return (s.structureType == STRUCTURE_STORAGE) 
@@ -40,21 +49,32 @@ var courier =  {
             }
             if(target) {
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(target);
                 } 
             } else {
-                creep.moveTo(spawn1);//Game.flags['outOfTheWay']);
+                creep.moveTo(spawn1.room.controller);
             }
         } else { 
-            creep.say("gathering");
-            var t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 30, {
+            // creep.say("gathering");
+            // fix overfilled terminals
+            // if(spawn1.room.terminal && _.sum(spawn1.room.terminal.store) > 290000) {
+            //     for(let rss in spawn1.room.terminal.store) {
+            //         if(creep.withdraw(spawn1.room.terminal, rss, _.sum(spawn1.room.terminal.store) - 290000) != OK) {
+            //             creep.moveTo(spawn1.room.terminal);
+            //         } 
+            //         creep.drop(rss);
+            //     }
+            //     return;
+            // }
+
+            let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 30, {
                     filter: (r) => r.resourceType == RESOURCE_ENERGY});
-            if(t.length > 0) {
+            if(t.length > 25) {
                 creep.pickup(t[0])
                 creep.moveTo(t[0]);
                 return;
             }
-            var source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            let source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
                     && s.store[RESOURCE_ENERGY] > 50)});   
             if(!source) {
@@ -70,7 +90,7 @@ var courier =  {
                 if(creep.carry.energy > 0)
                     creep.memory.working = true;
                 else
-                    creep.moveTo(spawn1);
+                    creep.moveTo(spawn1.room.controller);
             }
         }
     },

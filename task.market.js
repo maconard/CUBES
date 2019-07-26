@@ -2,7 +2,7 @@ let taskMarket = module.exports;
 taskMarket.run = function(spawns) {
     let spawn1 = spawns[0];
     let terminal = spawn1.room.terminal;
-    if(terminal && Game.time % 25 == 0) {
+    if(terminal && Game.time % 20 == 0) {
         for(let rss in terminal.store) {
             if(rss == RESOURCE_ENERGY) continue;
             if(terminal.store[RESOURCE_ENERGY] > 800 && terminal.store[rss] > 5000) {
@@ -18,7 +18,7 @@ taskMarket.run = function(spawns) {
                         .sort(function(a,b) { return b.price - a.price; }
                 );
                 if(orders.length > 0 && orders[0].price > minimumPrice) {
-                    if(Game.market.deal(orders[0].id, 200, spawn1.room.name) == OK) {
+                    if(Game.market.deal(orders[0].id, amtToSell, spawn1.room.name) == OK) {
                         Game.notify("Room: " + spawn1.room.name + ": Order to sell 200 of " + rss + " completed for " + orders[0].price * amtToSell + " credits (" + orders[0].price + "/ea).");
                         break;
                     }

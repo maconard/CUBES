@@ -13,13 +13,13 @@ miner.run = function(creep) {
 
     if(!creep.memory.working) {
         // creep.say("mining");
-        let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 30, {
-                filter: (r) => r.resourceType != RESOURCE_ENERGY});
-        if(t.length > 0) {
-            creep.pickup(t[0])
-            creep.moveTo(t[0]);
-            return;
-        }
+        // let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 30, {
+        //         filter: (r) => r.resourceType != RESOURCE_ENERGY});
+        // if(t.length > 0) {
+        //     creep.pickup(t[0])
+        //     creep.moveTo(t[0]);
+        //     return;
+        // }
         let source = creep.pos.findClosestByPath(FIND_MINERALS);
         if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
             if(creep.moveTo(source) == ERR_NO_PATH) {
@@ -28,7 +28,14 @@ miner.run = function(creep) {
     } else { //depositing minerals
         // creep.say("depositing");
         let term = spawn1.room.terminal;
-        if(term && _.sum(term.store) - term.store[RESOURCE_ENERGY] >= 280000)
+        if(!Memory.roomData[spawn1.room.name].mineral) {
+            let min = spawn1.room.find(FIND_MINERALS);
+            Memory.roomData[spawn1.room.name].mineral = min[0].mineralType;
+        }
+        let rss = Memory.roomData[spawn1.room.name].mineral;
+        if(!term.store[rss]) rss = 0;
+        
+        if(term && (term.storeCapacity - term.store[RESOURCE_ENERGY] - term.store[rss] <= 20000))
             term = false;
         if(term) {
             let hold = _.sum(creep.carry);

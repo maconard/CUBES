@@ -53,7 +53,7 @@ repairman.run = function(creep) {
         let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (s) => {
                 return ((s.structureType == STRUCTURE_CONTAINER || 
-                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50);
+                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 400);
             }
         });
         if(target){
@@ -66,9 +66,9 @@ repairman.run = function(creep) {
         }
     }
 };
-repairman.base = [WORK,CARRY,MOVE];
+repairman.base = [WORK,CARRY,MOVE,MOVE];
 repairman.add = {
     0: { type: WORK, amt: 12 },
-    1: { type: CARRY, amt: 12 },
+    1: { type: CARRY, amt: 11 },
     2: { type: MOVE, amt: 23 }
 };

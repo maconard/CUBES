@@ -216,3 +216,32 @@ taskCreeps.log = function(spawn1,roles) {
         roles.miner.num + " M, " + roles.invader.num + " I";
     global.displays.push(x);
 };
+
+if(!Creep.prototype._moveTo) {
+    Creep.prototype._moveTo = Creep.prototype.moveTo;
+
+    Creep.prototype.moveTo = function(target, opts={reusePath: 25, swampCost: 5}) {
+        // this._moveTo(target,opts);
+        let path = this.pos.findPathTo(target,opts);
+        if(path.length > 0) {
+            if(!Memory.roomData[this.room.name])
+                Memory.roomData[this.room.name] = { travelData: {} };
+                
+            if(this.move(path[0].direction) == OK) {
+                let dat = JSON.stringify({x:this.pos.x,y:this.pos.y});
+                if(!Memory.roomData[this.room.name].travelData[dat]) 
+                    Memory.roomData[this.room.name].travelData[dat] = 1;
+                else if(Memory.roomData[this.room.name].travelData[dat] < 40)
+                    Memory.roomData[this.room.name].travelData[dat]++;
+            }
+        }
+    }
+}
+
+if(!Creep.prototype._say) {
+    Creep.prototype._say = Creep.prototype.say;
+    Creep.prototype.say = function(x) {
+        //   this._say("[" + this.pos.x + "," + this.pos.y + "]");
+        // Creep.prototype._say(x);
+    };
+}

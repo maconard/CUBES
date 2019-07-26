@@ -44,6 +44,6 @@ harvester.run = function(creep) {
 };
 harvester.base = [WORK,MOVE];
 harvester.add = {
-    0: { type: WORK, amt: 4},
-    1: { type: MOVE, amt: 2}
+    0: { type: WORK, amt: 5},
+    1: { type: MOVE, amt: 3}
 };

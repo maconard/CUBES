@@ -26,16 +26,35 @@ function bodyCost (body) {
 
 let util = module.exports;
 util.goClaim = function(home,target) {
-    return Game.rooms[home].find(FIND_MY_SPAWNS)[0].spawnCreep(
-        [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE],
-        "claimer-"+home,
-        { memory: { home: home, role: "claimer", targetRoom: target } }
-    );
+    let result = -1;
+    let spawns = Game.rooms[home].find(FIND_MY_SPAWNS);
+    let i = 0;
+    while(result != OK) {
+        result = spawns[i].spawnCreep(
+            [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE,MOVE],
+            "claimer-"+home,
+            { memory: { home: home, role: "claimer", targetRoom: target } }
+        );
+        if(result == OK) {
+            Memory.roomData[home].claiming = target;
+            break;
+        }
+    }
+    return result;
 };
 util.pickupEnergyInRange = function(creep,range) {
     let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range, {
         filter: (r) => r.resourceType == RESOURCE_ENERGY});
     if(t.length > 0 && t[0].amount > 25) {
+        creep.pickup(t[0])
+        creep.moveTo(t[0]);
+        return true;
+    }
+    return false;
+};
+util.pickupResourceInRange = function(creep,range) {
+    let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range);
+    if(t.length > 0 && t[0].amount > 0) {
         creep.pickup(t[0])
         creep.moveTo(t[0]);
         return true;

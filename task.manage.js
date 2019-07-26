@@ -34,6 +34,7 @@ let attemptCreate = function(r,tgt,stype,count=0) {
 let taskManage = module.exports;
 taskManage.run = function(spawns) {
     let spawn1 = spawns[0];
+    let r = spawn1.room;
     if(Game.time % 300 == 0) {
         console.log(spawn1.room.name + ": scanning to place new structures...");
         this.plan(spawn1, STRUCTURE_EXTENSION, 'extensions', 1);
@@ -44,6 +45,13 @@ taskManage.run = function(spawns) {
         this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
         this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
         this.remove(spawn1, STRUCTURE_ROAD, 'roads');
+    }
+
+    let target = Memory.roomData[r.name].claiming;
+    if(target && Game.rooms[target]) {
+        if(Game.rooms[target].find(FIND_MY_SPAWNS).length > 0) {
+            delete Memory.roomData[r.name].claiming;
+        }
     }
 };
 taskManage.plan = function(spawn1, stype, eng, ptype) {
@@ -144,32 +152,3 @@ taskManage.remove = function(spawn1,stype,eng) {
         sites[i].remove();
     }
 };
-
-if(!Creep.prototype._moveTo) {
-    Creep.prototype._moveTo = Creep.prototype.moveTo;
-
-    Creep.prototype.moveTo = function(target, opts={}) {
-        // this._moveTo(target,opts);
-        let path = this.pos.findPathTo(target,opts);
-        if(path.length > 0) {
-            if(!Memory.roomData[this.room.name])
-                Memory.roomData[this.room.name] = { travelData: {} };
-                
-            if(this.move(path[0].direction) == OK) {
-                let dat = JSON.stringify({x:this.pos.x,y:this.pos.y});
-                if(!Memory.roomData[this.room.name].travelData[dat]) 
-                    Memory.roomData[this.room.name].travelData[dat] = 1;
-                else if(Memory.roomData[this.room.name].travelData[dat] < 40)
-                    Memory.roomData[this.room.name].travelData[dat]++;
-            }
-        }
-    }
-}
-
-if(!Creep.prototype._say) {
-    Creep.prototype._say = Creep.prototype.say;
-    Creep.prototype.say = function(x) {
-        //   this._say("[" + this.pos.x + "," + this.pos.y + "]");
-        // Creep.prototype._say(x);
-    };
-}

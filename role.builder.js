@@ -11,14 +11,25 @@ builder.run = function(creep) {
         creep.memory.working = true;
     }
 
+    let goClaim = false;
+    let targetR;
+    if(Memory.roomData[spawn1.room.name].claiming) {
+        targetR = Memory.roomData[spawn1.room.name].claiming;
+        if(Game.rooms[targetR]) {
+            let spawns = Game.rooms[targetR].find(FIND_CONSTRUCTION_SITES, {
+                filter: (c) => (c.structureType == STRUCTURE_SPAWN)
+            });
+            if(spawns.length > 0) {
+                goClaim = true;
+            }
+        }
+    }
+
     if(creep.memory.working) {
         // creep.say('building');
-        if(config.buildTarget != "" && spawn1.room.controller.level > 6) {
-            let targetRoom = config.buildTarget;
-            if(!(creep.room.name == targetRoom)) {
-                creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetRoom)));
-                return;
-            }
+        if(goClaim && !(creep.room.name == targetR)) {
+            creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
+            return;
         }
         
         let target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
@@ -41,12 +52,14 @@ builder.run = function(creep) {
     }
     else { //harvesting or collecting energy\
         // creep.say('collecting');
-        if(global.util.pickupEnergyInRange(creep,10)) return;
-
-        if(config.buildTarget != "" && creep.room.name == config.buildTarget) {
+        if(goClaim) {
+            if(!(creep.room.name == targetR)) {
+                creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
+                return;
+            }
             let source = creep.pos.findClosestByPath(FIND_SOURCES, {
                 filter: (s) => {
-                    return s.room.name == config.buildTarget;
+                    return s.room.name == targetR;
                 }
             });
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
@@ -60,7 +73,7 @@ builder.run = function(creep) {
             filter: (structure) => {
                 return ((structure.structureType == STRUCTURE_CONTAINER || 
                         structure.structureType == STRUCTURE_STORAGE) && 
-                        structure.store[RESOURCE_ENERGY] > 50);
+                        structure.store[RESOURCE_ENERGY] > 400);
             }
         });
         if(target) {
@@ -69,15 +82,17 @@ builder.run = function(creep) {
                 creep.moveTo(target);
             }       
         } else {
-            creep.moveTo(spawn1);
+            if(global.util.pickupEnergyInRange(creep,15)) return;
+            creep.moveTo(spawn1.room.controller);
         }
     }
 };
-builder.base = [WORK,CARRY,MOVE];
+builder.base = [WORK,CARRY,MOVE,MOVE];
 builder.add = {
     0: { type: WORK, amt: 12 },
-    1: { type: CARRY, amt: 12 },
-    2: { type: MOVE, amt: 23 }
+    1: { type: CARRY, amt: 11 },
+    2: { type: MOVE, amt: 23 },
+    3: { type: MOVE, amt: 23 }
     // 3: { type: TOUGH, amt: 5 },
     // 4: { type: TOUGH, amt: 5 }
 };

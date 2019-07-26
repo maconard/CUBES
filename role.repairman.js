@@ -48,8 +48,6 @@ repairman.run = function(creep) {
     }
     else {
         // creep.say('collecting');
-        if(global.util.pickupEnergyInRange(creep,15)) return;
-
         let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (s) => {
                 return ((s.structureType == STRUCTURE_CONTAINER || 
@@ -62,6 +60,7 @@ repairman.run = function(creep) {
             }
         } else {
             // harvester.run(creep);
+            if(global.util.pickupEnergyInRange(creep,40)) return;
             creep.moveTo(spawn1.room.controller);
         }
     }

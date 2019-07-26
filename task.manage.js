@@ -145,7 +145,8 @@ taskManage.remove = function(spawn1,stype,eng) {
             filter: (s) => {
                 let dat = JSON.stringify({x:s.pos.x,y:s.pos.y});
                 let t = s.structureType;
-                return (t === stype && !Memory.roomData[r.name].travelData[dat]);
+                return (t === stype && ((!Memory.roomData[r.name].travelData[dat]) || 
+                        (Memory.roomData[r.name].travelData[dat] && Memory.roomData[r.name].travelData[dat] < 10)));
             }
     });
     for(let i = 0; i < sites.length; i++) {

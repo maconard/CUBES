@@ -54,7 +54,8 @@ miner.run = function(creep) {
 };
 miner.base = [WORK,CARRY,MOVE];
 miner.add = {
-    0: { type: WORK, amt: 7},
-    1: { type: CARRY, amt: 3},
-    2: { type: MOVE, amt: 5}
+    0: { type: WORK, amt: 11},
+    1: { type: WORK, amt: 11},
+    2: { type: CARRY, amt: 3},
+    3: { type: MOVE, amt: 5}
 };

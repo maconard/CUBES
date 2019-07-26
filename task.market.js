@@ -3,14 +3,14 @@ taskMarket.run = function(spawns) {
     let spawn1 = spawns[0];
     let terminal = spawn1.room.terminal;
     if(terminal && Game.time % 20 == 0) {
+        let amtToSell = 200;
+        let maxEnergyCost = 800;
+        let reserveAmt = 5200;
+        let minimumPrice = 0.7;
         for(let rss in terminal.store) {
             if(rss == RESOURCE_ENERGY) continue;
-            if(terminal.store[RESOURCE_ENERGY] > 800 && terminal.store[rss] > 5000) {
+            if(terminal.store[RESOURCE_ENERGY] > maxEnergyCost && terminal.store[rss] > reserveAmt) {
                 // console.log("Room: " + spawn1.room.name + ": checking market for " + rss);
-                let amtToSell = 200;
-                let maxEnergyCost = 800;
-                let minimumPrice = 0.7;
-
                 let orders = Game.market.getAllOrders(
                     (order) => (order.resourceType == rss &&
                                 order.type == ORDER_BUY &&

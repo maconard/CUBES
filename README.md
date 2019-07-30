@@ -27,3 +27,11 @@ it has excess of, but will not create its own buy or sell orders.
 2. Auto-place Storage
 3. Auto-place and use Labs
 4. Autonomously claim new rooms (currently the player must indicate a room)
+
+# Files
+
+### Roles
+
+### Tasks
+
+### Other

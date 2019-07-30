@@ -220,7 +220,7 @@ taskCreeps.log = function(spawn1,roles) {
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;
 
-    Creep.prototype.moveTo = function(target, opts={reusePath: 25, swampCost: 5}) {
+    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5, maxRooms: 1}) {
         // this._moveTo(target,opts);
         let path = this.pos.findPathTo(target,opts);
         if(path.length > 0) {

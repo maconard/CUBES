@@ -8,7 +8,7 @@ taskGarbage.run = function() {
         }
 
         for(let i in Memory.roomData) {
-            if((Game.rooms[i] && !Game.rooms[i].controller.my) || !Game.rooms[i]) {
+            if((Game.rooms[i] && Game.rooms[i].controller && !Game.rooms[i].controller.my) || !Game.rooms[i]) {
                 delete Memory.roomData[i];
             }
         }

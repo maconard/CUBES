@@ -8,7 +8,7 @@ JavaScript or TypeScript code that controls your units, called Creeps.
 ### How does this AI work?
 This particular AI is simple, and doesn't have any unique traits that it tries to exhibit.
 The code execution is `task` based, meaning that each task is executed for each room on each
-game tick (see [main.js](https://github.com/maconard/CUBES/blob/master/main.js).
+game tick (see [main.js](https://github.com/maconard/CUBES/blob/master/main.js)).
 
 Rather than having a queue of actions to accomplish and assigning them to Creeps, each Creep is 
 born with a role that they uphold, in which they perform certain tasks. Creeps perform their role

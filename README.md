@@ -23,10 +23,8 @@ It supports rudimentary market use, as it can complete other players' buy orders
 it has excess of, but will not create its own buy or sell orders.
 
 ### TODO
-1. Auto-place Containers
-2. Auto-place Storage
-3. Auto-place and use Labs
-4. Autonomously claim new rooms (currently the player must indicate a room)
+1. Auto-place and use Labs
+2. Autonomously claim new rooms (currently the player must indicate a room)
 
 # Files
 

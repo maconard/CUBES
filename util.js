@@ -29,7 +29,7 @@ util.goClaim = function(home,target) {
     let result = -1;
     let spawns = Game.rooms[home].find(FIND_MY_SPAWNS);
     let i = 0;
-    while(result != OK) {
+    while(result != OK && i < spawns.length) {
         result = spawns[i].spawnCreep(
             [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE,MOVE],
             "claimer-"+home,
@@ -39,6 +39,7 @@ util.goClaim = function(home,target) {
             Memory.roomData[home].claiming = target;
             break;
         }
+        i++;
     }
     return result;
 };
@@ -95,7 +96,7 @@ util.bodyCost = function(body) {
 };
 util.initializeRoomData = function(spawns, r) {
     if(!Memory.roomData[r.name]) Memory.roomData[r.name] = { travelData: {}, sourceData: {} };
-    if(!Memory.roomData[r.name].sourceData) {
+    if(!Memory.roomData[r.name].sourceData || _.values(Memory.roomData[r.name].sourceData).length == 0) {
         Memory.roomData[r.name].sourceData = {};
         r.find(FIND_SOURCES).forEach(function(s) {
             if(!Memory.roomData[r.name].sourceData[s.id]) {

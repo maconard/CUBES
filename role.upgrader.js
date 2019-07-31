@@ -26,7 +26,7 @@ upgrader.run = function(creep) {
 
     if(creep.memory.working) {
         // creep.say('upgrading');
-        if(goClaim && !(creep.room.name == targetR)) {
+        if(goClaim && creep.memory.role == 'upgrader' && !(creep.room.name == targetR)) {
             creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
             return;
         }
@@ -36,7 +36,7 @@ upgrader.run = function(creep) {
     }
     else {
         // creep.say('collecting');
-        if(goClaim) {
+        if(goClaim && creep.memory.role == 'upgrader') {
             if(!(creep.room.name == targetR)) {
                 creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
                 return;
@@ -55,7 +55,7 @@ upgrader.run = function(creep) {
         
         let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (s) => (s.structureType == STRUCTURE_CONTAINER || 
-                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 250});
+                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50});
         if(target) {
             if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);

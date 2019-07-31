@@ -25,7 +25,7 @@ module.exports = {
         },
         2: {
             MAX_HARVESTER:      3,
-            MAX_BUILDER:        3,
+            MAX_BUILDER:        2,
             MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      1,
             MAX_COURIER:        1,
@@ -36,7 +36,7 @@ module.exports = {
         3: {
             MAX_HARVESTER:      3,
             MAX_BUILDER:        3,
-            MAX_UPGRADER:       3,
+            MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      2,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
@@ -45,8 +45,8 @@ module.exports = {
         },
         4: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        2,
-            MAX_UPGRADER:       3,
+            MAX_BUILDER:        3,
+            MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      2,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
@@ -55,8 +55,8 @@ module.exports = {
         },
         5: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        2,
-            MAX_UPGRADER:       3,
+            MAX_BUILDER:        3,
+            MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      1,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
@@ -66,7 +66,7 @@ module.exports = {
         6: {
             MAX_HARVESTER:      2,
             MAX_BUILDER:        2,
-            MAX_UPGRADER:       3,
+            MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      1,
             MAX_COURIER:        3,
             MAX_GUARDS:         0,

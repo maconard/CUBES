@@ -11,7 +11,7 @@ main.loop = function() {
     myRooms.forEach(function(r) {
         try {
             let spawns = r.find(FIND_MY_SPAWNS)
-            if(!r.controller.my || spawns.length == 0) return;
+            if(!r.controller || !r.controller.my || spawns.length == 0) return;
             global.util.initializeRoomData(spawns,r);
 
             tasks.forEach(function(task) { 

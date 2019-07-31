@@ -3,7 +3,7 @@ let builder = require('role.builder');
 let claimer = module.exports;
 claimer.run = function(creep) {
     let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
-    if(creep.memory.targetRoom && !creep.room.controller.my) {
+    if(creep.memory.targetRoom) {
         if(creep.room.name == creep.memory.targetRoom) {
             if(!creep.room.controller.my) {
                 let c = creep.claimController(creep.room.controller);

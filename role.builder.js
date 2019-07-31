@@ -27,7 +27,7 @@ builder.run = function(creep) {
 
     if(creep.memory.working) {
         // creep.say('building');
-        if(goClaim && !(creep.room.name == targetR)) {
+        if(goClaim && creep.memory.role == 'builder' && !(creep.room.name == targetR)) {
             creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
             return;
         }
@@ -52,7 +52,7 @@ builder.run = function(creep) {
     }
     else { //harvesting or collecting energy\
         // creep.say('collecting');
-        if(goClaim) {
+        if(goClaim && creep.memory.role == 'builder') {
             if(!(creep.room.name == targetR)) {
                 creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
                 return;

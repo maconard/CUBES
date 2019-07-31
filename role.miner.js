@@ -20,8 +20,28 @@ miner.run = function(creep) {
         //     creep.moveTo(t[0]);
         //     return;
         // }
-        let source = creep.pos.findClosestByPath(FIND_MINERALS);
-        if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+
+        let source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
+            && Object.keys(s.store).length > 1)});
+        if(source) {
+            for(let rss in source.store) {
+                if(rss == RESOURCE_ENERGY) continue;
+                if(creep.withdraw(source,rss) != OK) {
+                    creep.moveTo(source);
+                }
+                return;
+            }
+        }
+
+        source = creep.pos.findClosestByPath(FIND_MINERALS);
+        let result = creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE) {
+            if(creep.moveTo(source) == ERR_NO_PATH) {
+            }
+        } else if(result == ERR_NOT_ENOUGH_RESOURCES && sum > 0) {
+            creep.memory.working = true;
+        } else {
             if(creep.moveTo(source) == ERR_NO_PATH) {
             }
         }
@@ -35,14 +55,15 @@ miner.run = function(creep) {
         let rss = Memory.roomData[spawn1.room.name].mineral;
         if(!term.store[rss]) rss = 0;
         
-        if(term && (term.storeCapacity - term.store[RESOURCE_ENERGY] - term.store[rss] <= 20000))
-            term = false;
+        // if(term && (term.storeCapacity - term.store[RESOURCE_ENERGY] - term.store[rss] <= 20000))
+        //     term = false;
         if(term) {
-            let hold = _.sum(creep.carry);
-            let amt = 280000 - _.sum(term.store);
-            if(amt > hold) amt = hold;
+            // let hold = _.sum(creep.carry);
+            // let amt = 280000 - _.sum(term.store);
+            // if(amt > hold) amt = hold;
             for(let r in creep.carry) {
-                let result = creep.transfer(term, r, amt);
+                if(r == RESOURCE_ENERGY) continue;
+                let result = creep.transfer(term, r);
                 if(result == ERR_NOT_IN_RANGE) {
                     creep.moveTo(term);
                 } else if(result == OK) {

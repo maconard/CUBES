@@ -17,6 +17,6 @@ taskVisuals.run = function(spawns) {
 taskVisuals.global = function() {
     // if(!Memory.visuals) return;
     for(let i = 0; i < global.displays.length; i++) {
-        new RoomVisual().text(global.displays[i],0.5,i+0.5, {align: "left"});
+        new RoomVisual().text(global.displays[i],0.5,i+0.5, {align: "left", opacity: 0.25});
     }
 };

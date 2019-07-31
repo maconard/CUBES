@@ -5,7 +5,7 @@ taskMarket.run = function(spawns) {
     if(terminal && Game.time % 20 == 0) {
         let amtToSell = 200;
         let maxEnergyCost = 800;
-        let reserveAmt = 5200;
+        let reserveAmt = 10200;
         let minimumPrice = 0.7;
         for(let rss in terminal.store) {
             if(rss == RESOURCE_ENERGY) continue;

@@ -88,6 +88,22 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
     let tLevel = cLevel;
     let that = this;
     let quit = false;
+
+    if(!Memory.roomData[spawns[0].room.name].avgDistToSource) {
+        let dist = 0, sourceC = 0;
+        let sources = spawns[0].room.find(FIND_SOURCES);
+        //if sources are far from controller, increase max courier count
+        for(let i in sources) {
+            let path = PathFinder.search(spawns[0].room.controller.pos,sources[i].pos).path;
+            dist += path.length;
+            sourceC++;
+        }
+        Memory.roomData[spawns[0].room.name].avgDistToSource = dist/sourceC;
+    }
+    if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 60) roles['courier'].max+=3;
+    else if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 40) roles['courier'].max+=2;
+    else if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 20) roles['courier'].max++;
+
     for(let k in roles) {
         if(k == 'invader' || k == 'miner' || quit) continue;
         if(roles[k].num < roles[k].max) {
@@ -210,17 +226,19 @@ taskCreeps.log = function(spawn1,roles) {
     }
     if(spawn1.room.storage)
         contained += spawn1.room.storage.store[RESOURCE_ENERGY];
-    let x = spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; " + 
-        roles.harvester.num + " H, " + roles.builder.num + " B, " + roles.upgrader.num + 
-        " U, " + roles.repairman.num + " R, " + roles.courier.num + " C, " + roles.guard.num + " G, " + 
-        roles.miner.num + " M, " + roles.invader.num + " I";
+    let population = roles.harvester.num + roles.builder.num + roles.upgrader.num + roles.repairman.num +
+                        roles.courier.num + roles.guard.num + roles.miner.num + roles.invader.num + roles.claimer.num;
+    let x = "Level " + spawn1.room.controller.level + ", " + spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; population " + population;// + 
+        // roles.harvester.num + " H, " + roles.builder.num + " B, " + roles.upgrader.num + 
+        // " U, " + roles.repairman.num + " R, " + roles.courier.num + " C, " + roles.guard.num + " G, " + 
+        // roles.miner.num + " M, " + roles.invader.num + " I";
     global.displays.push(x);
 };
 
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;
 
-    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5, maxRooms: 1}) {
+    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5}) { //, maxRooms: 1
         // this._moveTo(target,opts);
         let path = this.pos.findPathTo(target,opts);
         if(path.length > 0) {

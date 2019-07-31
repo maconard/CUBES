@@ -41,9 +41,11 @@ taskManage.run = function(spawns) {
         this.plan(spawn1, STRUCTURE_TOWER, 'towers', 1);
         this.plan(spawn1, STRUCTURE_SPAWN, 'spawns', 1);
         this.plan(spawn1, STRUCTURE_TERMINAL, 'terminals', 1);
+        this.plan(spawn1, STRUCTURE_CONTAINER, 'containers', 2);
         this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
         this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
         this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
+        this.plan(spawn1, STRUCTURE_STORAGE, 'storage', 6);
         this.remove(spawn1, STRUCTURE_ROAD, 'roads');
     }
 
@@ -109,7 +111,11 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             depth++;
         }
     } else if(ptype == 2) { //construct at source
-
+        let sourceData = Memory.roomData[r.name].sourceData;
+        for(let id in sourceData) {
+            let tgt = JSON.parse(sourceData[id].container);
+            attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
+        }
     } else if(ptype == 3) { //construct on beaten path
         let travelDat = Memory.roomData[r.name].travelData;
         for(key in travelDat) {
@@ -137,6 +143,12 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             tgt = m.pos;
             attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
         });
+    } else if(ptype == 6) { //construct up to 5 into route from controller to spawn
+        let route = PathFinder.search(spawn1.controller,spawn1);
+        let i = 4;
+        while(i >= 0 && !attemptCreate(r,r.getPositionAt(route[i].x,route[i].y,r.name),stype)) {
+            i--;
+        }
     }
 };
 taskManage.remove = function(spawn1,stype,eng) {

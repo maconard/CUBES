@@ -21,9 +21,13 @@ miner.run = function(creep) {
         //     return;
         // }
 
-        let source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
-            && Object.keys(s.store).length > 1)});
+        let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+            filter: (s) => ((_.sum(s.store) - s.store[RESOURCE_ENERGY]) > 0)});
+        if(!source) { 
+            source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 
+                && Object.keys(s.store).length > 1)});
+        }
         if(source) {
             for(let rss in source.store) {
                 if(rss == RESOURCE_ENERGY) continue;

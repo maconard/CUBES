@@ -6,6 +6,8 @@ let courier = require('role.courier');
 let guard = require('role.guard');
 let invader = require('role.invader');
 let claimer = require('role.claimer');
+let cleric = require('role.cleric');
+let powerminer = require('role.powerminer');
 let miner = require('role.miner');
 let config = require('config');
         
@@ -50,8 +52,13 @@ taskCreeps.run = function(spawns) {
     let emg = this.emergency(spawns, roles);
 
     //Normal Spawning
-    if(!emg)
+    if(!emg) {
         this.spawning(spawns, roles, cLevel);
+
+        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 6000 && false) {
+            this.spawnPower(spawns,roles);
+        } 
+    }
     
     //Logging
     this.log(spawn1,roles);
@@ -83,6 +90,17 @@ taskCreeps.emergency = function(spawns, roles) {
     else if(roles.guard.num < 1 && hostiles > 0)
         return this.spawn(spawns,roles, 'guard') == OK;
     return false;
+};
+taskCreeps.spawnPower = function(spawns, roles) {
+    roles.cleric.max = 2;
+    roles.powerminer.max = 2;
+
+    if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max) {
+        this.spawn(spawns,roles,"powerminer",roles.powerminer.job.base,3000);
+    } 
+    if(roles.cleric.num <= roles.powerminer.num && roles.cleric.num < roles.cleric.max) {
+        this.spawn(spawns,roles,"cleric",false,3000);
+    }
 };
 taskCreeps.spawning = function(spawns, roles, cLevel) {
     let tLevel = cLevel;
@@ -189,6 +207,7 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
     } else if(result == OK) {
         console.log(spawns[0].room.name + ": birthed " + name + ", [" + body + "]");
         Memory.role_ids[role]++;
+        roles[role].num++;
         return OK;
     }
 };
@@ -201,8 +220,10 @@ taskCreeps.init = function(cLevel) {
         courier: {job: courier, num: 0},
         guard: {job: guard, num: 0},
         invader: {job: invader, num: 0},
-        claimer: {job: claimer, num: 0},
-        miner: {job: miner, num: 0}
+        claimer: {job: claimer, num: 0, max: 0},
+        miner: {job: miner, num: 0},
+        cleric: {job: cleric, num: 0, max: 0},
+        powerminer: {job: powerminer, num: 0, max: 0}
     };
     roles.harvester.max     = config.count.override.MAX_HARVESTER || config.count[cLevel].MAX_HARVESTER;
     roles.builder.max       = config.count.override.MAX_BUILDER || config.count[cLevel].MAX_BUILDER;
@@ -212,7 +233,6 @@ taskCreeps.init = function(cLevel) {
     roles.guard.max         = config.count.override.MAX_GUARDS || config.count[cLevel].MAX_GUARDS;
     roles.invader.max       = config.count.override.MAX_INVADERS || config.count[cLevel].MAX_INVADERS;
     roles.miner.max         = config.count.override.MAX_MINER || config.count[cLevel].MAX_MINER;
-    roles.claimer.max       = 0;
     return roles;
 };
 taskCreeps.log = function(spawn1,roles) {
@@ -227,13 +247,15 @@ taskCreeps.log = function(spawn1,roles) {
     if(spawn1.room.storage)
         contained += spawn1.room.storage.store[RESOURCE_ENERGY];
     let population = roles.harvester.num + roles.builder.num + roles.upgrader.num + roles.repairman.num +
-                        roles.courier.num + roles.guard.num + roles.miner.num + roles.invader.num + roles.claimer.num;
+                        roles.courier.num + roles.guard.num + roles.miner.num + roles.invader.num + roles.claimer.num +
+                        roles.cleric.num + roles.powerminer.num;
     let x = "Level " + spawn1.room.controller.level + ", " + spawn1.room.name + ": " + spawn1.room.energyAvailable + " energy and " + contained + " contained; population " + population;// + 
         // roles.harvester.num + " H, " + roles.builder.num + " B, " + roles.upgrader.num + 
         // " U, " + roles.repairman.num + " R, " + roles.courier.num + " C, " + roles.guard.num + " G, " + 
         // roles.miner.num + " M, " + roles.invader.num + " I";
     global.displays.push(x);
 };
+taskCreeps.name = "creeps";
 
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;

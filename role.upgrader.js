@@ -71,7 +71,7 @@ upgrader.add = {
     0: { type: WORK, amt: 12 },
     1: { type: CARRY, amt: 11 },
     2: { type: MOVE, amt: 23 },
-    3: { type: MOVE, amt: 23 }
+    // 3: { type: MOVE, amt: 23 }
     // 3: { type: TOUGH, amt: 5 },
     // 4: { type: TOUGH, amt: 5 }
 };

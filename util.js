@@ -118,6 +118,7 @@ util.processTickData = function() {
         Memory.tickData.time = t;
     }
     global.displays.push("Average tick rate: " + Memory.tickData.rate + " ticks/s");
+    global.displays.push("Tick % 100 = " + Game.time % 100);
 };
 util.setupRoomData = function() {
     if(!Memory.roomData) Memory.roomData = {};

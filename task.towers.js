@@ -15,18 +15,26 @@ taskTowers.run = function(spawns) {
                 tower.heal(target);
                 continue;
             }
-            target = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (s) => ((
-                    (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < 1000) || 
-                    ((s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART && 
-                        s.structureType != STRUCTURE_ROAD) && s.hits < s.hitsMax) ||
-                    (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.75 &&
-                        Memory.roomData[tower.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20))
+        }
+    }
+    let repairs = spawn1.room.find(FIND_STRUCTURES, {
+        filter: (s) => ((
+            (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < 1000) || 
+            ((s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART && 
+                s.structureType != STRUCTURE_ROAD) && s.hits < 0.9 * s.hitsMax) ||
+            (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.75 &&
+                Memory.roomData[spawn1.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20))
+    });
+    if(repairs.length && towers.length) {
+        for(let target in repairs) {
+            let ts = repairs[target].pos.findInRange(towers, 18, {
+                filter: (t) => (t.energy > 10)
             });
-            if(target) {
+            for(let tower of ts) {
                 tower.repair(target);
-                continue;
+                // continue;
             }
         }
     }
 };
+taskTowers.name = "towers";

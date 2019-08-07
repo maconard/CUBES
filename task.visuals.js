@@ -20,3 +20,4 @@ taskVisuals.global = function() {
         new RoomVisual().text(global.displays[i],0.5,i+0.5, {align: "left", opacity: 0.25});
     }
 };
+taskVisuals.name = "visuals";

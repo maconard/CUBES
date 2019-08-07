@@ -1,6 +1,6 @@
 let taskGarbage = module.exports;
 taskGarbage.run = function() {
-    if(Game.time % 150 == 0) {
+    if(Game.time % 200 == 0) {
         for(let i in Memory.creeps) {
             if(!Game.creeps[i]) {
                 delete Memory.creeps[i];
@@ -25,3 +25,4 @@ taskGarbage.run = function() {
         });
     }
 };
+taskGarbage.name = "garbage";

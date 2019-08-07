@@ -7,7 +7,8 @@ let limits = {
     [STRUCTURE_SPAWN]: { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 3 },
     [STRUCTURE_RAMPART]: { 0: 0, 1: 00, 2: 0, 3: 10, 4: 20, 5: 50, 6: 100, 7: 200, 8: 200 },
     [STRUCTURE_TERMINAL]: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 1, 7: 1, 8: 1 },
-    [STRUCTURE_EXTRACTOR]: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 1, 7: 1, 8: 1 }
+    [STRUCTURE_EXTRACTOR]: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 1, 7: 1, 8: 1 },
+    [STRUCTURE_POWER_SPAWN]: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 1 }
 };
 
 let canBuildHere = function(room,x,y) {
@@ -35,23 +36,42 @@ let taskManage = module.exports;
 taskManage.run = function(spawns) {
     let spawn1 = spawns[0];
     let r = spawn1.room;
-    if(Game.time % 300 == 0) {
+    let rcl = r.controller.level;
+    if(Game.time % 100 == 0) {
         console.log(spawn1.room.name + ": scanning to place new structures...");
-        this.plan(spawn1, STRUCTURE_EXTENSION, 'extensions', 1);
-        this.plan(spawn1, STRUCTURE_TOWER, 'towers', 1);
-        this.plan(spawn1, STRUCTURE_SPAWN, 'spawns', 1);
-        this.plan(spawn1, STRUCTURE_TERMINAL, 'terminals', 1);
-        this.plan(spawn1, STRUCTURE_CONTAINER, 'containers', 2);
         this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
-        this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
-        this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
-        this.plan(spawn1, STRUCTURE_STORAGE, 'storage', 6);
-        this.remove(spawn1, STRUCTURE_ROAD, 'roads');
+        this.plan(spawn1, STRUCTURE_CONTAINER, 'containers', 2);
+
+        if(rcl > 1) {
+            this.plan(spawn1, STRUCTURE_EXTENSION, 'extensions', 1);
+            if(rcl > 2) {
+                this.plan(spawn1, STRUCTURE_TOWER, 'towers', 1);
+                if(rcl > 3) {
+                    this.plan(spawn1, STRUCTURE_STORAGE, 'storage', 6);
+                    if(rcl > 5) {
+                        this.plan(spawn1, STRUCTURE_TERMINAL, 'terminals', 1);
+                        this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
+                        this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
+                        if(rcl > 6) {
+                            this.plan(spawn1, STRUCTURE_SPAWN, 'spawns', 1);
+                            if(rcl > 7) {
+                                this.plan(spawn1, STRUCTURE_POWER_SPAWN, 'powerspawn', 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // this.remove(spawn1, STRUCTURE_ROAD, 'roads');
     }
 
     let target = Memory.roomData[r.name].claiming;
     if(target && Game.rooms[target]) {
         if(Game.rooms[target].find(FIND_MY_SPAWNS).length > 0) {
+            let pioneers = Game.rooms[target].find(FIND_MY_CREEPS);
+            for(let p in pioneers) {
+                Game.creeps[pioneers[p].name].memory.home = target;
+            }
             delete Memory.roomData[r.name].claiming;
         }
     }
@@ -70,8 +90,8 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
     let limit = limits[stype][rcl];
     if(count >= limit) return;
     if(stype != STRUCTURE_ROAD && stype != STRUCTURE_RAMPART) {
-        let msg = r.name + ": missing " + eng + ", at " + count + " of " + limit;
-        global.displays.push(msg);
+        // let msg = r.name + ": missing " + eng + ", at " + count + " of " + limit;
+        // global.displays.push(msg);
     }
     
     if(ptype == 1) { //construct surrounding the spawn
@@ -129,8 +149,8 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             filter: (s) => {
                 let t = s.structureType;
                 return (t == STRUCTURE_SPAWN || t == STRUCTURE_STORAGE || t == STRUCTURE_POWER_SPAWN ||
-                    t == STRUCTURE_NUKER || t == STRUCTURE_OBSERVER || t == STRUCTURE_TOWER ||
-                    t == STRUCTURE_TERMINAL || t == STRUCTURE_LAB);
+                    // t == STRUCTURE_NUKER || t == STRUCTURE_OBSERVER || t == STRUCTURE_TOWER ||
+                    t == STRUCTURE_TERMINAL);// || t == STRUCTURE_LAB);
         }});
         structs.forEach(function(s) {
             tgt = s.pos;
@@ -144,7 +164,7 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
         });
     } else if(ptype == 6) { //construct up to 5 into route from controller to spawn
-        let route = PathFinder.search(spawn1.controller,spawn1);
+        let route = PathFinder.search(spawn1.room.controller,spawn1).path;
         let i = 4;
         while(i >= 0 && !attemptCreate(r,r.getPositionAt(route[i].x,route[i].y,r.name),stype)) {
             i--;
@@ -165,3 +185,4 @@ taskManage.remove = function(spawn1,stype,eng) {
         sites[i].remove();
     }
 };
+taskManage.name = "planning";

@@ -20,7 +20,8 @@ guard.run = function(creep) {
             creep.moveTo(target);
         }
     } else {
-        creep.moveTo(controller);//Game.flags['guardPost']);
+        if(spawn1.recycleCreep(creep) != OK)
+            creep.moveTo(spawn1);//Game.flags['guardPost']);
     }
 };
 guard.base = [TOUGH,MOVE,ATTACK];

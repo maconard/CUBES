@@ -49,14 +49,17 @@ taskCreeps.run = function(spawns) {
     roles = this.creeping(spawn1, roles);
 
     //Emergency Spawning
-    let emg = this.emergency(spawns, roles);
+    let emg = false;//this.emergency(spawns, roles);
 
     //Normal Spawning
     if(!emg) {
         this.spawning(spawns, roles, cLevel);
 
-        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 6000 && false) {
-            this.spawnPower(spawns,roles);
+        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 5000) {
+            let bank = Game.getObjectById(Memory.roomData[spawn1.room.name].power);
+            if(bank.timeToDecay > 150) {
+                this.spawnPower(spawns,roles);
+            }
         } 
     }
     
@@ -67,7 +70,9 @@ taskCreeps.creeping = function(spawn1, roles) {
     let roomCreeps = _.filter(Game.creeps, c => c.memory.home == spawn1.room.name);
     for(let c in roomCreeps) {
         let creep = Game.creeps[roomCreeps[c].name];
+        // if(creep.memory.role == 'courier') continue;
         roles[creep.memory.role].job.run(creep);
+        // if(creep.ticksToLive > 30)
         roles[creep.memory.role].num++;
     }
     return roles;
@@ -92,14 +97,14 @@ taskCreeps.emergency = function(spawns, roles) {
     return false;
 };
 taskCreeps.spawnPower = function(spawns, roles) {
-    roles.cleric.max = 2;
-    roles.powerminer.max = 2;
+    roles.cleric.max = Memory.roomData[spawns[0].room.name].powerAccess;
+    roles.powerminer.max = Memory.roomData[spawns[0].room.name].powerAccess;
 
-    if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max) {
-        this.spawn(spawns,roles,"powerminer",roles.powerminer.job.base,3000);
+    if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max && spawns[0].room.energyAvailable > 2000) {
+        this.spawn(spawns,roles,"powerminer",roles.powerminer.job.base,4500);
     } 
-    if(roles.cleric.num <= roles.powerminer.num && roles.cleric.num < roles.cleric.max) {
-        this.spawn(spawns,roles,"cleric",false,3000);
+    else if(roles.cleric.num < roles.powerminer.num && roles.cleric.num < roles.cleric.max && spawns[0].room.energyAvailable > 3000) {
+        this.spawn(spawns,roles,"cleric",false,5500);
     }
 };
 taskCreeps.spawning = function(spawns, roles, cLevel) {

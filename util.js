@@ -119,9 +119,15 @@ util.processTickData = function() {
     }
     global.displays.push("Average tick rate: " + Memory.tickData.rate + " ticks/s");
     global.displays.push("Tick % 100 = " + Game.time % 100);
+    global.displays.push("CPU Bucket: " + Game.cpu.bucket);
 };
 util.setupRoomData = function() {
     if(!Memory.roomData) Memory.roomData = {};
     delete Memory.tickData;
     Memory.tickData = { time: new Date().getTime() / 1000, ticks: 0, rate: "Calculating"};
+};
+util.isWalkable = function(x, y, room, terrain) {
+    if(terrain.get(x,y) == TERRAIN_MASK_WALL) // terrain is an unwalkable wall tile
+        return false;
+    let data = room.lookAt(x,y);
 };

@@ -45,8 +45,7 @@ courier.run = function(creep) {
                 target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => {
                         return ((s.structureType == STRUCTURE_CONTAINER) 
-                            && _.sum(s.store) < s.storeCapacity) ||
-                            (s.structureType == STRUCTURE_POWER_SPAWN && s.energy < s.energyCapacity)
+                            && _.sum(s.store) < s.storeCapacity)
                     }
                 });
             }
@@ -59,17 +58,22 @@ courier.run = function(creep) {
             }
         } else if(creep.carry[RESOURCE_POWER] > 0) {
             let powerSpawn = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (s.structureType == STRUCTURE_POWER_SPAWN)
+                filter: (s) => (s.structureType == STRUCTURE_POWER_SPAWN && s.room.name == creep.room.name)
             });
             if(powerSpawn.length) {
-                if(powerSpawn[0].power < powerSpawn[0].powerCapacity) {
-                    if(creep.transfer(powerSpawn,RESOURCE_POWER) != OK) {
-                        creep.moveTo(powerSpawn);
+                if(powerSpawn[0].power < 40) {
+                    if(creep.transfer(powerSpawn[0],RESOURCE_POWER) != OK) {
+                        creep.moveTo(powerSpawn[0]);
                     }
+                    return;
                 } else if(spawn1.room.storage) {
                     if(creep.transfer(spawn1.room.storage,RESOURCE_POWER) != OK) {
                         creep.moveTo(spawn1.room.storage);
                     }
+                }
+            } else if(spawn1.room.storage) {
+                if(creep.transfer(spawn1.room.storage,RESOURCE_POWER) != OK) {
+                    creep.moveTo(spawn1.room.storage);
                 }
             }
         } else {
@@ -80,11 +84,7 @@ courier.run = function(creep) {
             }
             for(let rss in creep.carry) {
                 if(rss == RESOURCE_ENERGY) continue;
-                if(rss == Memory.roomData[spawn1.room.name].mineral) {
-                    if(term && (term.storeCapacity - term.store[RESOURCE_ENERGY] - term.store[rss] <= 20000))
-                        term = false;
-                }
-                if(term) {
+                if(term && term.storeCapacity - _.sum(term.store) > 0) {
                     let result = creep.transfer(term, rss);
                     if(result == ERR_NOT_IN_RANGE) {
                         creep.moveTo(term);
@@ -105,11 +105,37 @@ courier.run = function(creep) {
             }
             return;
         }
+        let powerSpawn = creep.room.find(FIND_STRUCTURES, {
+            filter: (s) => (s.structureType == STRUCTURE_POWER_SPAWN)
+        });
+        if(powerSpawn.length && creep.room.storage && creep.room.storage.store[RESOURCE_POWER] &&
+                creep.room.storage.store[RESOURCE_POWER] > 100 && powerSpawn[0].power < 20) {
+            let amt = creep.carryCapacity - _.sum(creep.carry);
+            let amtPower = creep.room.storage.store[RESOURCE_POWER] - 100;
+            if(amt > amtPower) amt = amtPower;
+            if(creep.withdraw(creep.room.storage, RESOURCE_POWER, amt) != OK) {
+                creep.moveTo(creep.room.storage);
+            } 
+            return;
+        }
 
-        if(global.util.pickupResourceInRange(creep,35)) return;
+        let term = creep.room.terminal;
+        if(term && term.store[RESOURCE_POWER] && term.store[RESOURCE_POWER] > 0) {
+            if(creep.withdraw(term, RESOURCE_POWER) != OK) {
+                creep.moveTo(term);
+            } 
+            return;
+        }
+
+        if(global.util.pickupResourceInRange(creep,40)) return;
         let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
-            filter: (s) => (s.store[RESOURCE_ENERGY] > 0)}); 
+            filter: (s) => (_.sum(s.store) > 0)}); 
 
+        if(!source) {
+            if(term && term.store[RESOURCE_ENERGY] > 11000) {
+                source = term;
+            }  
+        }
         if(!source) {
             source = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => ((s.structureType == STRUCTURE_CONTAINER) 

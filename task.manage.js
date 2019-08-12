@@ -38,7 +38,7 @@ taskManage.run = function(spawns) {
     let r = spawn1.room;
     let rcl = r.controller.level;
     if(Game.time % 100 == 0) {
-        console.log(spawn1.room.name + ": scanning to place new structures...");
+        // console.log(spawn1.room.name + ": scanning to place new structures...");
         this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
         this.plan(spawn1, STRUCTURE_CONTAINER, 'containers', 2);
 

@@ -31,19 +31,21 @@ let attemptCreate = function(r,tgt,stype,count=0) {
     }
     return false;
 };
+const buildDelay = 100;
 
 let taskManage = module.exports;
 taskManage.run = function(spawns) {
     let spawn1 = spawns[0];
     let r = spawn1.room;
     let rcl = r.controller.level;
-    if(!Memory.roomData[r.name].offset) {
+    let offset = Memory.roomData[r.name].offset;
+    if(!offset) {
         let vals = r.name.split(new RegExp(/[a-zA-Z]/));
-        let offset = parseInt(vals[1]) + parseInt(vals[2]);
-        if(offset >= 100) offset = offset % 100;
+        offset = parseInt(vals[1] + vals[2]);
+        if(offset >= buildDelay) offset = offset % buildDelay;
         Memory.roomData[r.name].offset = offset;
     }
-    if((Game.time % 100) - Memory.roomData[r.name].offset == 0) {
+    if(Game.time % buildDelay == offset) {
         // console.log(spawn1.room.name + ": scanning to place new structures...");
         this.plan(spawn1, STRUCTURE_ROAD, 'roads', 3);
         this.plan(spawn1, STRUCTURE_CONTAINER, 'containers', 2);

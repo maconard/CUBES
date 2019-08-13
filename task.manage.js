@@ -164,7 +164,7 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
             attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
         });
     } else if(ptype == 6) { //construct up to 5 into route from controller to spawn
-        let route = PathFinder.search(spawn1.room.controller,spawn1).path;
+        let route = PathFinder.search(spawn1.room.controller.pos,spawn1).path;
         let i = 4;
         while(i >= 0 && !attemptCreate(r,r.getPositionAt(route[i].x,route[i].y,r.name),stype)) {
             i--;

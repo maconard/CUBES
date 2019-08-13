@@ -1,7 +1,7 @@
+global.util = require('util');
 const tasks = [require('task.creeps'), require('task.towers'), require('task.manage'), require('task.market'), require('task.power'), require('task.visuals')];
 const garbage = require('task.garbage');
 const visuals = tasks[5];
-global.util = require('util');
 global.util.setupRoomData();
 
 const profiler = require('screeps-profiler');

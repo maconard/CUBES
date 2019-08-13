@@ -29,13 +29,15 @@ util.goClaim = function(home,target) {
     let result = -1;
     let spawns = Game.rooms[home].find(FIND_MY_SPAWNS);
     let i = 0;
+    let body = [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE,MOVE];
     while(result != OK && i < spawns.length) {
         result = spawns[i].spawnCreep(
-            [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE,MOVE],
+            body,
             "claimer-"+home,
             { memory: { home: home, role: "claimer", targetRoom: target } }
         );
         if(result == OK) {
+            console.log(spawns[0].room.name + ": birthed claimer-" + home + ", [" + body + "]");
             Memory.roomData[home].claiming = target;
             break;
         }
@@ -130,4 +132,14 @@ util.isWalkable = function(x, y, room, terrain) {
     if(terrain.get(x,y) == TERRAIN_MASK_WALL) // terrain is an unwalkable wall tile
         return false;
     let data = room.lookAt(x,y);
+    let walkable = true;
+    data.forEach(function(o) {
+        if(walkable == false) return;
+        if(o.type == 'structure') {
+            if(o.structure.structureType != STRUCTURE_CONTAINER && o.structure.structureType != STRUCTURE_ROAD) {
+                walkable = false;
+            }
+        }
+    });
+    return walkable;
 };

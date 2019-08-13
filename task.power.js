@@ -8,11 +8,9 @@ taskPower.run = function(spawns) {
     let powerSpawns = r.find(FIND_STRUCTURES, {
         filter: (s) => (s.structureType == STRUCTURE_POWER_SPAWN)
     });
-    if(Game.time % 20 == 0) {
-        if(powerBanks.length) {
-            let msg = r.name + " has power, " + Math.round(100.0*powerBanks[0].hits/powerBanks[0].hitsMax) + "% remaining, " + powerBanks[0].ticksToDecay + " ticks remaining";
-            console.log(msg); Game.notify(msg);
-        }
+    if(powerBanks.length > 0 && powerBanks[0].ticksToDecay % 20 == 0) {
+        let msg = r.name + " has power, " + Math.round(100.0*powerBanks[0].hits/powerBanks[0].hitsMax) + "% remaining, " + powerBanks[0].ticksToDecay + " ticks remaining";
+        console.log(msg); Game.notify(msg);
     }
     if(powerBanks.length && (!Memory.roomData[r.name].power || !Memory.roomData[r.name].powerAccess)) {
         let powerBank = powerBanks[0];
@@ -22,14 +20,14 @@ taskPower.run = function(spawns) {
             let x = powerBank.pos.x;
             let y = powerBank.pos.y;
             let access = 0;
-            if(terrain.get(x+1,y)==0) access++;
-            if(terrain.get(x-1,y)==0) access++;
-            if(terrain.get(x,y+1)==0) access++;
-            if(terrain.get(x,y-1)==0) access++;
-            if(terrain.get(x+1,y+1)==0) access++;
-            if(terrain.get(x-1,y-1)==0) access++;
-            if(terrain.get(x-1,y+1)==0) access++;
-            if(terrain.get(x+1,y-1)==0) access++;
+            if(global.util.isWalkable(x+1,y,r,terrain)) access++;
+            if(global.util.isWalkable(x-1,y,r,terrain)) access++;
+            if(global.util.isWalkable(x,y+1,r,terrain)) access++;
+            if(global.util.isWalkable(x,y-1,r,terrain)) access++;
+            if(global.util.isWalkable(x+1,y+1,r,terrain)) access++;
+            if(global.util.isWalkable(x-1,y-1,r,terrain)) access++;
+            if(global.util.isWalkable(x-1,y+1,r,terrain)) access++;
+            if(global.util.isWalkable(x+1,y-1,r,terrain)) access++;
             Memory.roomData[r.name].powerAccess = access;
         }
     } else if(!powerBanks.length && (Memory.roomData[r.name].power || Memory.roomData[r.name].powerAccess)) {
@@ -38,8 +36,8 @@ taskPower.run = function(spawns) {
     }
 
     if(powerSpawns.length && powerSpawns[0].power >= 1 && powerSpawns[0].energy >= 50) {
-        powerSpawns[0].processPower();
-        Game.notify(r.name + " processed power, GPL = " + (Game.gpl.level + (Math.round(1000*Game.gpl.progress/Game.gpl.progressTotal)/1000)));
+        if(powerSpawns[0].processPower() == OK && powerSpawns[0].power % 5 == 0)
+            Game.notify(r.name + " processed power, GPL = " + (Game.gpl.level + (Math.round(1000*Game.gpl.progress/Game.gpl.progressTotal)/1000)));
     }
 };
 taskPower.name = "power";

@@ -49,15 +49,15 @@ taskCreeps.run = function(spawns) {
     roles = this.creeping(spawn1, roles);
 
     //Emergency Spawning
-    let emg = false;//this.emergency(spawns, roles);
+    let emg = this.emergency(spawns, roles);
 
     //Normal Spawning
     if(!emg) {
         this.spawning(spawns, roles, cLevel);
 
-        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 5000) {
+        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 6000) {
             let bank = Game.getObjectById(Memory.roomData[spawn1.room.name].power);
-            if(bank.timeToDecay > 150) {
+            if(bank.ticksToDecay > 150) {
                 this.spawnPower(spawns,roles);
             }
         } 
@@ -78,32 +78,35 @@ taskCreeps.creeping = function(spawn1, roles) {
     return roles;
 };
 taskCreeps.emergency = function(spawns, roles) {
-    let hostiles = spawns[0].room.find(FIND_HOSTILE_CREEPS).length;
-    if(hostiles > 0) {
+    let hostiles = spawns[0].room.find(FIND_HOSTILE_CREEPS);
+    let available = spawns[0].room.energyAvailable;
+    let max = config.spawnEnergy[spawns[0].room.controller.level];
+    if(available > max) available = max;
+    if(hostiles.length > 0) {
         let date = global.util.getDate();
+        Game.notify("Room " + spawns[0].room.name + " has been entered by " + hostiles[0].owner + " at " + date + ".");
         for(let i = 0; i < hostiles.length; i++) {
-            Game.notify("Room " + spawns[0].room.name + " has been entered by " + hostiles[i].owner + " at " + date + ".");
             Game.notify("Invader " + hostiles[i].name + " has parts: " + hostiles[i].body);
         }
     }
     if(roles.harvester.num == 0)
-        return this.spawn(spawns,roles, 'harvester') == OK;
+        return this.spawn(spawns,roles, 'harvester', false, available) == OK;
     else if(roles.courier.num == 0)
-        return this.spawn(spawns,roles, 'courier') == OK;
+        return this.spawn(spawns,roles, 'courier', false, available) == OK;
     else if(roles.upgrader.num == 0)
-        return this.spawn(spawns,roles, 'upgrader') == OK;
+        return this.spawn(spawns,roles, 'upgrader', false, available) == OK;
     else if(roles.guard.num < 1 && hostiles > 0)
-        return this.spawn(spawns,roles, 'guard') == OK;
+        return this.spawn(spawns,roles, 'guard', false, available) == OK;
     return false;
 };
 taskCreeps.spawnPower = function(spawns, roles) {
     roles.cleric.max = Memory.roomData[spawns[0].room.name].powerAccess;
     roles.powerminer.max = Memory.roomData[spawns[0].room.name].powerAccess;
 
-    if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max && spawns[0].room.energyAvailable > 2000) {
-        this.spawn(spawns,roles,"powerminer",roles.powerminer.job.base,4500);
+    if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max && spawns[0].room.energyAvailable > 3000) {
+        this.spawn(spawns,roles,"powerminer",false,4500);
     } 
-    else if(roles.cleric.num < roles.powerminer.num && roles.cleric.num < roles.cleric.max && spawns[0].room.energyAvailable > 3000) {
+    if(roles.cleric.num < roles.powerminer.num && roles.cleric.num < roles.cleric.max && spawns[0].room.energyAvailable > 3000) {
         this.spawn(spawns,roles,"cleric",false,5500);
     }
 };
@@ -151,6 +154,12 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
 };
 taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
     if(!Memory.role_ids[role]) Memory.role_ids[role] = 1;
+    let maxEnergy = energy || config.spawnEnergy[spawns[0].room.controller.level];
+    let availableEnergy = spawns[0].room.energyAvailable;
+    let capacityEnergy = spawns[0].room.energyCapacityAvailable;
+    
+    if(override == false && availableEnergy < maxEnergy && 
+        capacityEnergy >= maxEnergy) return;
     
     let body;
     let pool = [];
@@ -180,12 +189,11 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
     }
 
     let nrg = global.util.bodyCost(body);
-    if(!energy) energy = config.spawnEnergy[spawns[0].room.controller.level];
     let j = 0;
-    while(nrg < spawns[0].room.energyAvailable && nrg < energy && j < pool.length) {
+    while(nrg < availableEnergy && nrg < maxEnergy && j < pool.length) {
         let part = pool[j];
         if(!part) { j++; continue; }
-        if(nrg + cost[part] >= spawns[0].room.energyAvailable || nrg + cost[part] >= energy)
+        if(nrg + cost[part] >= availableEnergy || nrg + cost[part] >= maxEnergy)
             break;
         body.push(part);
         nrg += cost[part];
@@ -265,7 +273,7 @@ taskCreeps.name = "creeps";
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;
 
-    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5}) { //, maxRooms: 1
+    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5, maxRooms: 2}) { //, maxRooms: 1
         // this._moveTo(target,opts);
         let path = this.pos.findPathTo(target,opts);
         if(path.length > 0) {

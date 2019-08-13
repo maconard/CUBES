@@ -129,7 +129,7 @@ courier.run = function(creep) {
 
         if(global.util.pickupResourceInRange(creep,40)) return;
         let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
-            filter: (s) => (_.sum(s.store) > 0)}); 
+            filter: (s) => (s.store.energy > 0)}); 
 
         if(!source) {
             if(term && term.store[RESOURCE_ENERGY] > 11000) {

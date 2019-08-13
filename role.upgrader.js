@@ -38,7 +38,7 @@ upgrader.run = function(creep) {
         // creep.say('collecting');
         if(goClaim && creep.memory.role == 'upgrader') {
             if(!(creep.room.name == targetR)) {
-                creep.moveTo(creep.pos.findClosestByRange(creep.room.findExitTo(targetR)));
+                creep.moveTo(creep.pos.findClosestByPath(creep.room.findExitTo(targetR)));
                 return;
             }
             let source = creep.pos.findClosestByPath(FIND_SOURCES, {
@@ -53,15 +53,21 @@ upgrader.run = function(creep) {
             return;
         }
         
-        let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (s) => (s.structureType == STRUCTURE_CONTAINER || 
-                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 50});
+        let store = spawn1.room.storage;
+        let target = false;
+        if(store && store.store.energy >= 50) {
+            target = store;
+        }
+        if(!store) {
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= 50)});
+        }
         if(target) {
             if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }
         } else {
-            if(global.util.pickupEnergyInRange(creep,35)) return;
+            if(global.util.pickupEnergyInRange(creep,20)) return;
             creep.moveTo(spawn1.room.controller);
         }
     }

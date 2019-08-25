@@ -1,6 +1,6 @@
 let taskGarbage = module.exports;
 taskGarbage.run = function() {
-    if(Game.time % 200 == 0) {
+    if(Game.time % 250 == 0) {
         for(let i in Memory.creeps) {
             if(!Game.creeps[i]) {
                 delete Memory.creeps[i];
@@ -13,13 +13,13 @@ taskGarbage.run = function() {
             }
         }
     
-        _.toArray(Game.spawns).forEach(function(s) {
-            if(!Memory.roomData[s.room.name]) return;
-            let travelDat = Memory.roomData[s.room.name].travelData;
+        _.toArray(Game.rooms).forEach(function(r) {
+            if(!Memory.roomData[r.name]) return;
+            let travelDat = Memory.roomData[r.name].travelData;
             for(key in travelDat) {
-                travelDat[key] -= 3;
+                travelDat[key] -= 2;
                 if(travelDat[key] <= 0) {
-                    delete Memory.roomData[s.room.name].travelData[key];
+                    delete Memory.roomData[r.name].travelData[key];
                 }
             };
         });

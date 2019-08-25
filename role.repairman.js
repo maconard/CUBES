@@ -1,4 +1,4 @@
-let builder = require('role.builder');
+let upgrader = require('role.upgrader');
 let priority = {
     [STRUCTURE_SPAWN]: 20,
     [STRUCTURE_CONTROLLER]: 19,
@@ -43,31 +43,37 @@ repairman.run = function(creep) {
                 creep.moveTo(targets[0]);
             }
         } else {
-            builder.run(creep);
+            upgrader.run(creep);
         }
     }
     else {
         // creep.say('collecting');
-        let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (s) => {
-                return ((s.structureType == STRUCTURE_CONTAINER || 
-                            s.structureType == STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] >= 400);
-            }
-        });
-        if(target){
+        let store = spawn1.room.storage;
+        let target = false;
+        if(store && store.store.energy >= 50) {
+            target = store;
+        }
+        if(!store) {
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= 50)});
+        }
+        if(target) {
             if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);   
+                creep.moveTo(target);
             }
         } else {
-            // harvester.run(creep);
-            if(global.util.pickupEnergyInRange(creep,40)) return;
-            creep.moveTo(spawn1.room.controller);
+            if(global.util.pickupEnergyInRange(creep,20)) return;
+            
+            if(creep.carry.energy > 0)
+                creep.memory.working = true;
+            else
+                creep.moveTo(spawn1.room.controller);
         }
     }
 };
 repairman.base = [WORK,CARRY,MOVE,MOVE];
 repairman.add = {
-    0: { type: WORK, amt: 12 },
-    1: { type: CARRY, amt: 11 },
-    2: { type: MOVE, amt: 23 }
+    0: { type: WORK, amt: 19 },
+    1: { type: CARRY, amt: 14 },
+    2: { type: MOVE, amt: 13 }
 };

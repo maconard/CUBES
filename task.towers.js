@@ -10,9 +10,9 @@ taskTowers.run = function(spawns) {
         filter: (s) => ((
             (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < 1000) || 
             ((s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART && 
-                s.structureType != STRUCTURE_ROAD) && s.hits < 0.9 * s.hitsMax) ||
-            (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.75 &&
-                Memory.roomData[spawn1.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 20))
+                s.structureType != STRUCTURE_ROAD) && s.hits < 0.8 * s.hitsMax) ||
+            (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax * 0.5 &&
+                Memory.roomData[spawn1.room.name].travelData[JSON.stringify({x:s.pos.x,y:s.pos.y})] > 25))
     });
     let hostileTargets = spawn1.room.find(FIND_HOSTILE_CREEPS);
     let healTargets = spawn1.room.find(FIND_MY_CREEPS, {

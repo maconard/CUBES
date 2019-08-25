@@ -2,16 +2,7 @@ let harvester = module.exports;
 harvester.run = function(creep) {
     let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
 
-    // if(!creep.memory.source) {
-    //     let sources = spawn.room.find(FIND_SOURCES);
-    //     sources.forEach(function(s) {
-    //         if(!Memory.roomData[creep.room.name].sourceData) Memory.roomData[creep.room.name].sourceData = {};
-    //         if(!Memory.roomData[creep.room.name].sourceData[s.id]) Memory.roomData[creep.room.name].sourceData[s.id] = {count: 0};
-
-    //     });
-    // }
-
-    if(creep.carry.energy < creep.carryCapacity || creep.carryCapacity == 0) {
+    if(creep.carryCapacity == 0 || creep.carry.energy < creep.carryCapacity) {
         // creep.say("harvesting");
         let source = creep.pos.findClosestByPath(FIND_SOURCES, {
             filter: (s) => {
@@ -25,12 +16,12 @@ harvester.run = function(creep) {
         // creep.say("depositing");
         let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (s) => (
-                                (((s.structureType == STRUCTURE_CONTAINER ||  
-                                    s.structureType == STRUCTURE_STORAGE) && 
-                                    s.store[RESOURCE_ENERGY] < s.storeCapacity) ||
-                                    (s.structureType == STRUCTURE_EXTENSION &&
-                                    s.energy < s.energyCapacity)) && 
-                                    creep.pos.getRangeTo(s) < 30)});
+                    (((s.structureType == STRUCTURE_CONTAINER ||  
+                        s.structureType == STRUCTURE_STORAGE) && 
+                        _.sum(s.store) < s.storeCapacity) ||
+                        (s.structureType == STRUCTURE_EXTENSION &&
+                        s.energy < s.energyCapacity)))
+        });
         if(target) {
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
@@ -45,5 +36,5 @@ harvester.run = function(creep) {
 harvester.base = [WORK,MOVE];
 harvester.add = {
     0: { type: WORK, amt: 5},
-    1: { type: MOVE, amt: 3}
+    1: { type: MOVE, amt: 5}
 };

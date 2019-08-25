@@ -52,6 +52,11 @@ upgrader.run = function(creep) {
             }
             return;
         }
+
+        if(creep.room.controller.level == 8 && creep.room.energyAvailable < 3000 && creep.room.controller.ticksToDowngrade > 50000) {
+            creep.moveTo(creep.room.controller);
+            return;
+        }
         
         let store = spawn1.room.storage;
         let target = false;
@@ -68,15 +73,19 @@ upgrader.run = function(creep) {
             }
         } else {
             if(global.util.pickupEnergyInRange(creep,20)) return;
-            creep.moveTo(spawn1.room.controller);
+            
+            if(creep.carry.energy > 0)
+                creep.memory.working = true;
+            else
+                creep.moveTo(spawn1.room.controller);
         }
     }
 };
-upgrader.base = [WORK,CARRY,MOVE,MOVE];
+upgrader.base = [WORK,CARRY,MOVE];
 upgrader.add = {
-    0: { type: WORK, amt: 12 },
-    1: { type: CARRY, amt: 11 },
-    2: { type: MOVE, amt: 23 },
+    0: { type: WORK, amt: 19 },
+    1: { type: CARRY, amt: 14 },
+    2: { type: MOVE, amt: 14 }
     // 3: { type: MOVE, amt: 23 }
     // 3: { type: TOUGH, amt: 5 },
     // 4: { type: TOUGH, amt: 5 }

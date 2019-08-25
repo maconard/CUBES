@@ -45,19 +45,20 @@ util.goClaim = function(home,target) {
     }
     return result;
 };
-util.pickupEnergyInRange = function(creep,range) {
+util.pickupEnergyInRange = function(creep,range,minAmount=25) {
     let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range, {
         filter: (r) => r.resourceType == RESOURCE_ENERGY});
-    if(t.length > 0 && t[0].amount > 25) {
+    if(t.length > 0 && t[0].amount > minAmount) {
         creep.pickup(t[0])
         creep.moveTo(t[0]);
         return true;
     }
     return false;
 };
-util.pickupResourceInRange = function(creep,range) {
-    let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range);
-    if(t.length > 0 && t[0].amount > 0) {
+util.pickupResourceInRange = function(creep,range,minAmount=0) {
+    let t = creep.pos.findInRange(FIND_DROPPED_RESOURCES, range, {
+        filter: (r) => r.resourceType != RESOURCE_ENERGY});
+    if(t.length > 0 && t[0].amount > minAmount) {
         creep.pickup(t[0])
         creep.moveTo(t[0]);
         return true;

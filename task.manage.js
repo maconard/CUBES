@@ -59,7 +59,7 @@ taskManage.run = function(spawns) {
                     if(rcl > 5) {
                         this.plan(spawn1, STRUCTURE_TERMINAL, 'terminals', 1);
                         this.plan(spawn1, STRUCTURE_EXTRACTOR, 'extractors', 5);
-                        this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
+                        // this.plan(spawn1, STRUCTURE_RAMPART, 'ramparts', 4);
                         if(rcl > 6) {
                             this.plan(spawn1, STRUCTURE_SPAWN, 'spawns', 1);
                             if(rcl > 7) {
@@ -147,7 +147,7 @@ taskManage.plan = function(spawn1, stype, eng, ptype) {
     } else if(ptype == 3) { //construct on beaten path
         let travelDat = Memory.roomData[r.name].travelData;
         for(key in travelDat) {
-            if(travelDat[key] > 34) {
+            if(travelDat[key] > 30) {
                 let tgt = JSON.parse(key);
                 attemptCreate(r,r.getPositionAt(tgt.x,tgt.y,r.name),stype);
             }

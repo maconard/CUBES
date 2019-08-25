@@ -1,7 +1,7 @@
 module.exports = {
     buildTarget: "",
     upgradeTarget: "",
-    spawnEnergy: { 0: 300, 1: 500, 2: 800, 3: 800, 4: 850, 5: 900, 6: 950, 7: 1050, 8: 1150},
+    spawnEnergy: { 0: 300, 1: 300, 2: 550, 3: 800, 4: 1000, 5: 1200, 6: 1500, 7: 1800, 8: 4000},
     count: {
         override: {
             MAX_HARVESTER:      0,
@@ -26,7 +26,7 @@ module.exports = {
         2: {
             MAX_HARVESTER:      2,
             MAX_BUILDER:        2,
-            MAX_UPGRADER:       2,
+            MAX_UPGRADER:       1,
             MAX_REPAIRMEN:      0,
             MAX_COURIER:        1,
             MAX_GUARDS:         0,
@@ -35,9 +35,9 @@ module.exports = {
         },
         3: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        3,
+            MAX_BUILDER:        2,
             MAX_UPGRADER:       2,
-            MAX_REPAIRMEN:      1,
+            MAX_REPAIRMEN:      0,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,
@@ -45,9 +45,9 @@ module.exports = {
         },
         4: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        3,
+            MAX_BUILDER:        2,
             MAX_UPGRADER:       2,
-            MAX_REPAIRMEN:      2,
+            MAX_REPAIRMEN:      1,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,
@@ -55,7 +55,7 @@ module.exports = {
         },
         5: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        3,
+            MAX_BUILDER:        2,
             MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      1,
             MAX_COURIER:        2,
@@ -68,16 +68,16 @@ module.exports = {
             MAX_BUILDER:        2,
             MAX_UPGRADER:       2,
             MAX_REPAIRMEN:      1,
-            MAX_COURIER:        3,
+            MAX_COURIER:        2,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,
             MAX_MINER:          1
         },
         7: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        2,
+            MAX_BUILDER:        1,
             MAX_UPGRADER:       2,
-            MAX_REPAIRMEN:      1,
+            MAX_REPAIRMEN:      0,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,
@@ -85,9 +85,9 @@ module.exports = {
         },
         8: {
             MAX_HARVESTER:      2,
-            MAX_BUILDER:        2,
-            MAX_UPGRADER:       2,
-            MAX_REPAIRMEN:      1,
+            MAX_BUILDER:        1,
+            MAX_UPGRADER:       1,
+            MAX_REPAIRMEN:      0,
             MAX_COURIER:        2,
             MAX_GUARDS:         0,
             MAX_INVADERS:       0,

@@ -23,8 +23,8 @@ claimer.run = function(creep) {
         builder.run(creep);
     }
 };
-claimer.base = [TOUGH,CLAIM,WORK,WORK,MOVE,MOVE,MOVE];
+claimer.base = [CLAIM,WORK,WORK,CARRY,MOVE,MOVE,MOVE,MOVE];
 claimer.add = {
-    0: { type: [MOVE], amt: 4},
-    1: { type: [TOUGH], amt: 4}
+    0: { type: [MOVE], amt: 2},
+    1: { type: [WORK], amt: 2}
 };

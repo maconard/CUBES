@@ -1,4 +1,4 @@
-let upgrader = require('role.upgrader');
+let repairman = require('role.repairman');
 let config = require('config');
 
 let builder = module.exports;
@@ -47,7 +47,7 @@ builder.run = function(creep) {
                 creep.moveTo(target);
             }
         } else {
-            upgrader.run(creep);
+            repairman.run(creep);
         }
     }
     else { //harvesting or collecting energy\
@@ -69,30 +69,34 @@ builder.run = function(creep) {
             return;
         }
 
-        let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return ((structure.structureType == STRUCTURE_CONTAINER || 
-                        structure.structureType == STRUCTURE_STORAGE) && 
-                        structure.store[RESOURCE_ENERGY] > 400);
-            }
-        });
+        let store = spawn1.room.storage;
+        let target = false;
+        if(store && store.store.energy >= 50) {
+            target = store;
+        }
+        if(!store) {
+            target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] >= 50)});
+        }
         if(target) {
-            let x = creep.withdraw(target, RESOURCE_ENERGY);
-            if(x == ERR_NOT_IN_RANGE) {
+            if(creep.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
-            }       
+            }
         } else {
-            if(global.util.pickupEnergyInRange(creep,15)) return;
-            creep.moveTo(spawn1.room.controller);
+            if(global.util.pickupEnergyInRange(creep,20)) return;
+            
+            if(creep.carry.energy > 0)
+                creep.memory.working = true;
+            else
+                creep.moveTo(spawn1.room.controller);
         }
     }
 };
-builder.base = [WORK,CARRY,MOVE,MOVE];
+builder.base = [WORK,CARRY,MOVE];
 builder.add = {
-    0: { type: WORK, amt: 12 },
-    1: { type: CARRY, amt: 11 },
-    2: { type: MOVE, amt: 23 },
-    3: { type: MOVE, amt: 23 }
+    0: { type: WORK, amt: 19 },
+    1: { type: CARRY, amt: 14 },
+    2: { type: MOVE, amt: 14 }
     // 3: { type: TOUGH, amt: 5 },
     // 4: { type: TOUGH, amt: 5 }
 };

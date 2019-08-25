@@ -43,34 +43,32 @@ taskCreeps.run = function(spawns) {
     
     // Init Roles
     let cLevel = spawn1.room.controller.level;
-    let roles = this.init(cLevel);
+    let roles = this.init(cLevel,spawns);
         
-    //Run Creep Roles
+    // Run Creep Roles
     roles = this.creeping(spawn1, roles);
 
-    //Emergency Spawning
-    let emg = this.emergency(spawns, roles);
+    // Emergency Spawning
+    this.emergency(spawns, roles);
 
-    //Normal Spawning
-    if(!emg) {
-        this.spawning(spawns, roles, cLevel);
+    // Normal Spawning
+    this.spawning(spawns, roles, cLevel);
 
-        if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 6000) {
-            let bank = Game.getObjectById(Memory.roomData[spawn1.room.name].power);
-            if(bank.ticksToDecay > 150) {
-                this.spawnPower(spawns,roles);
-            }
-        } 
-    }
+    // Powerminer Spawning
+    if(cLevel == 8 && Memory.roomData[spawn1.room.name].power && spawn1.room.energyAvailable > 6000) {
+        let bank = Game.getObjectById(Memory.roomData[spawn1.room.name].power);
+        if(bank && bank.ticksToDecay && bank.ticksToDecay > 150) {
+            this.spawnPower(spawns,roles);
+        }
+    } 
     
-    //Logging
+    // Logging
     this.log(spawn1,roles);
 };
 taskCreeps.creeping = function(spawn1, roles) {
     let roomCreeps = _.filter(Game.creeps, c => c.memory.home == spawn1.room.name);
     for(let c in roomCreeps) {
         let creep = Game.creeps[roomCreeps[c].name];
-        // if(creep.memory.role == 'courier') continue;
         roles[creep.memory.role].job.run(creep);
         // if(creep.ticksToLive > 30)
         roles[creep.memory.role].num++;
@@ -84,30 +82,28 @@ taskCreeps.emergency = function(spawns, roles) {
     if(available > max) available = max;
     if(hostiles.length > 0) {
         let date = global.util.getDate();
-        Game.notify("Room " + spawns[0].room.name + " has been entered by " + hostiles[0].owner + " at " + date + ".");
-        for(let i = 0; i < hostiles.length; i++) {
-            Game.notify("Invader " + hostiles[i].name + " has parts: " + hostiles[i].body);
-        }
+        Game.notify("Room " + spawns[0].room.name + " has been invaded by " + hostiles[0].owner.username + " at " + date + ".");
+        // for(let i = 0; i < hostiles.length; i++) {
+        //     Game.notify("Invader " + hostiles[i].name + " has parts: " + hostiles[i].body);
+        // }
     }
     if(roles.harvester.num == 0)
         return this.spawn(spawns,roles, 'harvester', false, available) == OK;
     else if(roles.courier.num == 0)
         return this.spawn(spawns,roles, 'courier', false, available) == OK;
-    else if(roles.upgrader.num == 0)
+    else if((roles.upgrader.num == 0 && spawns[0].room.controller.level < 8) || 
+            (roles.upgrader.num == 0 && spawns[0].room.controller.level == 8 && spawns[0].room.controller.ticksToDowngrade < 50000))
         return this.spawn(spawns,roles, 'upgrader', false, available) == OK;
     else if(roles.guard.num < 1 && hostiles > 0)
         return this.spawn(spawns,roles, 'guard', false, available) == OK;
     return false;
 };
 taskCreeps.spawnPower = function(spawns, roles) {
-    roles.cleric.max = Memory.roomData[spawns[0].room.name].powerAccess;
-    roles.powerminer.max = Memory.roomData[spawns[0].room.name].powerAccess;
-
     if(roles.powerminer.num <= roles.cleric.num && roles.powerminer.num < roles.powerminer.max && spawns[0].room.energyAvailable > 3000) {
         this.spawn(spawns,roles,"powerminer",false,4500);
     } 
-    if(roles.cleric.num < roles.powerminer.num && roles.cleric.num < roles.cleric.max && spawns[0].room.energyAvailable > 3000) {
-        this.spawn(spawns,roles,"cleric",false,5500);
+    else if(roles.cleric.num < roles.powerminer.num && roles.cleric.num < roles.cleric.max && spawns[0].room.energyAvailable > 3000) {
+        this.spawn(spawns,roles,"cleric",false,6750);
     }
 };
 taskCreeps.spawning = function(spawns, roles, cLevel) {
@@ -126,12 +122,11 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
         }
         Memory.roomData[spawns[0].room.name].avgDistToSource = dist/sourceC;
     }
-    if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 60) roles['courier'].max+=3;
-    else if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 40) roles['courier'].max+=2;
-    else if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 20) roles['courier'].max++;
+    if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 60) roles['courier'].max+=2;
+    else if(Memory.roomData[spawns[0].room.name].avgDistToSource >= 30) roles['courier'].max++;
 
     for(let k in roles) {
-        if(k == 'invader' || k == 'miner' || quit) continue;
+        if(k == 'invader' || k == 'miner' || k == 'cleric' || k == 'powerminer' || quit) continue;
         if(roles[k].num < roles[k].max) {
             if(that.spawn(spawns,roles, k) == OK)
             quit = true;
@@ -145,11 +140,11 @@ taskCreeps.spawning = function(spawns, roles, cLevel) {
     let term = (spawns[0].room.terminal ? _.sum(spawns[0].room.terminal.store) : 300000);
     if(mineral.length > 0 && mineral[0].mineralAmount > 0) mineral = true;
     else mineral = false;
-    if(roles.miner.num < roles.miner.max && extractors > 0 && mineral && term < 300000) {
+    if(roles.miner.num < roles.miner.max && extractors > 0 && mineral && term < 200000) {
         this.spawn(spawns,roles, 'miner');
     }      
     else if(roles.invader.num < roles.invader.max && spawns[0].room.energyAvailable >= 5000) {
-        this.spawn(spawns,roles, 'invader',false,6000);
+        this.spawn(spawns,roles, 'invader',false,5000);
     }        
 };
 taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
@@ -199,9 +194,22 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
         nrg += cost[part];
         j++;
     }
+    if(role == "harvester") {
+        let PCs = spawns[0].room.find(FIND_MY_POWER_CREEPS);
+        if(PCs.length > 0) {
+            j = 0;
+            while(nrg < availableEnergy && nrg < maxEnergy && j < 6) {
+                if(nrg + 100 >= availableEnergy || nrg + 100 >= maxEnergy)
+                    break;
+                body.push(WORK);
+                nrg += 100;
+                j++;
+            }
+        }
+    }
     
     body = body.sort((a,b) => priority[b] - priority[a]);
-    let birthData = {memory: {role: role, working: false, home: spawns[0].room.name}};
+    let birthData = {memory: {role: role, working: false, home: spawns[0].room.name, pathing: { stuckCount: 0, lastX: 0, lastY: 0 }}};
     let name = role + '-' + Memory.role_ids[role];
     let result = spawns[0].spawnCreep(body, name, birthData);
     let i = 1;
@@ -218,13 +226,13 @@ taskCreeps.spawn = function(spawns,roles,role,override=false,energy=false) {
         // console.log("ERROR: not enough energy");
         return ERR_NOT_ENOUGH_ENERGY;
     } else if(result == OK) {
-        console.log(spawns[0].room.name + ": birthed " + name + ", [" + body + "]");
+        console.log(spawns[0].room.name + ": birthed " + name + " with " + body.length + " parts");
         Memory.role_ids[role]++;
         roles[role].num++;
         return OK;
     }
 };
-taskCreeps.init = function(cLevel) {
+taskCreeps.init = function(cLevel,spawns) {
     let roles = {
         harvester: {job: harvester, num: 0},
         builder: {job: builder, num: 0},
@@ -235,8 +243,8 @@ taskCreeps.init = function(cLevel) {
         invader: {job: invader, num: 0},
         claimer: {job: claimer, num: 0, max: 0},
         miner: {job: miner, num: 0},
-        cleric: {job: cleric, num: 0, max: 0},
-        powerminer: {job: powerminer, num: 0, max: 0}
+        cleric: {job: cleric, num: 0, max: Memory.roomData[spawns[0].room.name].powerAccess},
+        powerminer: {job: powerminer, num: 0, max: Memory.roomData[spawns[0].room.name].powerAccess}
     };
     roles.harvester.max     = config.count.override.MAX_HARVESTER || config.count[cLevel].MAX_HARVESTER;
     roles.builder.max       = config.count.override.MAX_BUILDER || config.count[cLevel].MAX_BUILDER;
@@ -246,6 +254,9 @@ taskCreeps.init = function(cLevel) {
     roles.guard.max         = config.count.override.MAX_GUARDS || config.count[cLevel].MAX_GUARDS;
     roles.invader.max       = config.count.override.MAX_INVADERS || config.count[cLevel].MAX_INVADERS;
     roles.miner.max         = config.count.override.MAX_MINER || config.count[cLevel].MAX_MINER;
+
+    if(spawns[0].room.controller.level == 8 && spawns[0].room.controller.ticksToDowngrade > 50000 && spawns[0].room.energyAvailable < 6000)
+        roles.upgrader.max = 0;
     return roles;
 };
 taskCreeps.log = function(spawn1,roles) {
@@ -273,28 +284,79 @@ taskCreeps.name = "creeps";
 if(!Creep.prototype._moveTo) {
     Creep.prototype._moveTo = Creep.prototype.moveTo;
 
-    Creep.prototype.moveTo = function(target, opts={reusePath: 30, swampCost: 5, maxRooms: 2}) { //, maxRooms: 1
-        // this._moveTo(target,opts);
-        let path = this.pos.findPathTo(target,opts);
-        if(path.length > 0) {
-            if(!Memory.roomData[this.room.name])
-                Memory.roomData[this.room.name] = { travelData: {} };
-                
-            if(this.move(path[0].direction) == OK) {
+    Creep.prototype.moveTo = function(target, opts={reusePath: 15, maxRooms: 2, ignoreCreeps: true}) { 
+        // let path = this.pos.findPathTo(target,opts);
+        if(this.memory._move && this.memory._move.dest && target.pos) {
+            let tpos = target.pos;
+            let mpos = this.memory._move.dest;
+            if(tpos.x != mpos.x || tpos.y != mpos.y || tpos.room != mpos.room) delete this.memory._move;
+        }
+        if(this.memory.pathing && this.memory.pathing.stuckCount % 3 == 0) {
+            delete this.memory._move;
+            this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
+            opts.ignoreCreeps = false;
+        }
+        else if(this.fatigue == 0) {
+            if(this.memory.pathing && this.memory.pathing.lastX == this.pos.x && this.memory.pathing.lastY == this.pos.y) {
+                this.memory.pathing.stuckCount = this.memory.pathing.stuckCount+1;
+            } else {
+                this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
+            }
+        }
+        
+        if(Math.random() < 0.2) {
+            // if(this.memory._move) delete this.memory._move;
+            opts.ignoreCreeps = false;
+        }
+
+        opts.plainCost = 1;
+        opts.swampCost = 5;
+        opts.costCallback = function(roomName, costs) {
+            let room = Game.rooms[roomName];
+            if (!room || !Memory.roomData[roomName]) return;
+
+            if(!Memory.roomData[roomName].pathing) Memory.roomData[roomName].pathing = { tick: 0, matrix: "" };
+            let pathing = Memory.roomData[roomName].pathing;
+            if(pathing.tick != Game.time || pathing.matrix == "") {
+                // costs = new PathFinder.CostMatrix;
+                room.find(FIND_STRUCTURES).forEach(function(struct) {
+                    if (struct.structureType === STRUCTURE_ROAD) {
+                        costs.set(struct.pos.x, struct.pos.y, 1);
+                    } else if (struct.structureType !== STRUCTURE_CONTAINER &&
+                            (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                        costs.set(struct.pos.x, struct.pos.y, 0xff);
+                    }
+                });
+                room.find(FIND_CREEPS).forEach(function(creep) {
+                    let x = creep.pos.x; let y = creep.pos.y;
+                    costs.set(x, y, 10);
+                });
+                room.find(FIND_POWER_CREEPS).forEach(function(creep) {
+                    let x = creep.pos.x; let y = creep.pos.y;
+                    costs.set(x, y, 10);
+                });
+                Memory.roomData[roomName].pathing.tick = Game.time;
+                Memory.roomData[roomName].pathing.matrix = costs.serialize();
+            } else {
+                costs = PathFinder.CostMatrix.deserialize(Memory.roomData[roomName].pathing.matrix);
+            }
+
+            return costs;
+        };
+        let result = this._moveTo(target,opts);
+        if(result == OK) {
+            // this.memory.pathing.stuckCount++;
+            if(Memory.roomData[this.room.name]) {
                 let dat = JSON.stringify({x:this.pos.x,y:this.pos.y});
                 if(!Memory.roomData[this.room.name].travelData[dat]) 
                     Memory.roomData[this.room.name].travelData[dat] = 1;
                 else if(Memory.roomData[this.room.name].travelData[dat] < 40)
                     Memory.roomData[this.room.name].travelData[dat]++;
             }
-        }
+        } 
     }
 }
 
-if(!Creep.prototype._say) {
-    Creep.prototype._say = Creep.prototype.say;
-    Creep.prototype.say = function(x) {
-        //   this._say("[" + this.pos.x + "," + this.pos.y + "]");
-        // Creep.prototype._say(x);
-    };
+if(!PowerCreep.prototype._moveTo) {
+    PowerCreep.prototype._moveTo = Creep.prototype._moveTo;
 }

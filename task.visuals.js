@@ -2,11 +2,11 @@ let taskVisuals = module.exports;
 taskVisuals.run = function(spawns) {
     let s = spawns[0];
     if(!Memory.visuals) return;
-    if(!Memory.roomData[s.room.name]) Memory.roomData[s.room.name] = { travelData: {} };
+    if(!Memory.roomData[s.room.name]) Memory.roomData[s.room.name] = { travelData: {}, sourceData: {} };
     let travel = Memory.roomData[s.room.name].travelData;
     for(let t in travel) {
         let dt = JSON.parse(t);
-        if(travel[t] > 35)
+        if(travel[t] > 30)
             s.room.visual.rect(dt.x - 0.5, dt.y - 0.5, 1, 1, { fill: "#ff0000", opacity: .3 }); //red, lots of travel
         else if(travel[t] > 15)
             s.room.visual.rect(dt.x - 0.5, dt.y - 0.5, 1, 1, { fill: "#ff00ff", opacity: .3 }); //magenta, mild travel

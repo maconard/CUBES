@@ -77,17 +77,20 @@ courier.run = function(creep) {
                 }
             }
         } else {
-            let term = creep.room.terminal;
+            let target = creep.room.terminal;
             if(!Memory.roomData[creep.room.name].mineral) {
                 let min = creep.room.find(FIND_MINERALS);
                 Memory.roomData[creep.room.name].mineral = min[0].mineralType;
             }
+            if(_.sum(target.store) == target.storeCapacity) {
+                target = creep.room.storage;
+            }
             for(let rss in creep.carry) {
                 if(rss == RESOURCE_ENERGY) continue;
-                if(term && term.storeCapacity - _.sum(term.store) > 0) {
-                    let result = creep.transfer(term, rss);
+                if(target && target.storeCapacity - _.sum(target.store) > 0) {
+                    let result = creep.transfer(target, rss);
                     if(result == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(term);
+                        creep.moveTo(target);
                     } else if(result == OK) {
                         break;
                     }
@@ -105,6 +108,15 @@ courier.run = function(creep) {
             }
             return;
         }
+        power = creep.room.find(FIND_STRUCTURES, {
+            filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_POWER])}); 
+        if(power.length) {
+            if(creep.withdraw(power[0],RESOURCE_POWER) != OK) {
+                creep.moveTo(power[0]);
+            }
+            return;
+        }
+        
         let powerSpawn = creep.room.find(FIND_STRUCTURES, {
             filter: (s) => (s.structureType == STRUCTURE_POWER_SPAWN)
         });
@@ -127,12 +139,14 @@ courier.run = function(creep) {
             return;
         }
 
-        if(global.util.pickupResourceInRange(creep,40)) return;
-        let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
-            filter: (s) => (s.store.energy > 0)}); 
+        let amt = (creep.carryCapacity < 150 ? creep.carryCapacity : 150)
+        if(global.util.pickupEnergyInRange(creep,40,amt)) return;
+        if(global.util.pickupResourceInRange(creep,40,25)) return;
 
+        let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
+            filter: (s) => (s.store.energy > 50)}); 
         if(!source) {
-            if(term && term.store[RESOURCE_ENERGY] > 11000) {
+            if(term && term.store[RESOURCE_ENERGY] > 13000) {
                 source = term;
             }  
         }

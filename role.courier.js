@@ -1,3 +1,5 @@
+let config = require('config');
+
 let courier = module.exports;
 courier.run = function(creep) {
     let spawn1 = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS)[0];
@@ -34,11 +36,18 @@ courier.run = function(creep) {
                 } 
                 return;
             }
+            let stor = creep.room.storage;
+            if(stor && term && _.sum(term.store) < 290000 && stor.store[RESOURCE_ENERGY] > config.energyShareThreshold) {
+                if(creep.transfer(term, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(term);
+                } 
+                return;
+            }
     
             target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => {
                         return (s.structureType == STRUCTURE_STORAGE) 
-                            && _.sum(s.store) < s.storeCapacity
+                            && _.sum(s.store) < s.storeCapacity * 0.95
                     }
             });
             if(!target) {
@@ -82,9 +91,10 @@ courier.run = function(creep) {
                 let min = creep.room.find(FIND_MINERALS);
                 Memory.roomData[creep.room.name].mineral = min[0].mineralType;
             }
-            if(_.sum(target.store) == target.storeCapacity) {
+            if(target && _.sum(target.store) == target.storeCapacity) {
                 target = creep.room.storage;
             }
+            if(!target) return;
             for(let rss in creep.carry) {
                 if(rss == RESOURCE_ENERGY) continue;
                 if(target && target.storeCapacity - _.sum(target.store) > 0) {
@@ -132,6 +142,7 @@ courier.run = function(creep) {
         }
 
         let term = creep.room.terminal;
+        let stor = creep.room.storage;
         if(term && term.store[RESOURCE_POWER] && term.store[RESOURCE_POWER] > 0) {
             if(creep.withdraw(term, RESOURCE_POWER) != OK) {
                 creep.moveTo(term);
@@ -146,7 +157,7 @@ courier.run = function(creep) {
         let source = creep.pos.findClosestByPath(FIND_TOMBSTONES, {
             filter: (s) => (s.store.energy > 50)}); 
         if(!source) {
-            if(term && term.store[RESOURCE_ENERGY] > 13000) {
+            if(term && term.store[RESOURCE_ENERGY] > 13000 && stor && stor.store[RESOURCE_ENERGY] < 200000) {
                 source = term;
             }  
         }

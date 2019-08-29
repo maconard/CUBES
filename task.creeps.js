@@ -257,6 +257,9 @@ taskCreeps.init = function(cLevel,spawns) {
 
     if(spawns[0].room.controller.level == 8 && spawns[0].room.controller.ticksToDowngrade > 50000 && spawns[0].room.energyAvailable < 6000)
         roles.upgrader.max = 0;
+    if(spawns[0].room.storage && spawns[0].room.storage.store[RESOURCE_ENERGY] > 150000 
+            && spawns[0].room.controller.effects && spawns[0].room.controller.effects.length > 0)
+        roles.upgrader.max += 2;//Math.floor(spawns[0].room.storage.store[RESOURCE_ENERGY] / 300000);
     return roles;
 };
 taskCreeps.log = function(spawn1,roles) {
@@ -270,6 +273,8 @@ taskCreeps.log = function(spawn1,roles) {
     }
     if(spawn1.room.storage)
         contained += spawn1.room.storage.store[RESOURCE_ENERGY];
+    if(spawn1.room.terminal)
+        contained += spawn1.room.terminal.store[RESOURCE_ENERGY];
     let population = roles.harvester.num + roles.builder.num + roles.upgrader.num + roles.repairman.num +
                         roles.courier.num + roles.guard.num + roles.miner.num + roles.invader.num + roles.claimer.num +
                         roles.cleric.num + roles.powerminer.num;
@@ -286,26 +291,27 @@ if(!Creep.prototype._moveTo) {
 
     Creep.prototype.moveTo = function(target, opts={reusePath: 15, maxRooms: 2, ignoreCreeps: true}) { 
         // let path = this.pos.findPathTo(target,opts);
+        if(target == null) return;
         if(this.memory._move && this.memory._move.dest && target.pos) {
             let tpos = target.pos;
             let mpos = this.memory._move.dest;
             if(tpos.x != mpos.x || tpos.y != mpos.y || tpos.room != mpos.room) delete this.memory._move;
         }
-        if(this.memory.pathing && this.memory.pathing.stuckCount % 3 == 0) {
-            delete this.memory._move;
-            this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
-            opts.ignoreCreeps = false;
-        }
-        else if(this.fatigue == 0) {
-            if(this.memory.pathing && this.memory.pathing.lastX == this.pos.x && this.memory.pathing.lastY == this.pos.y) {
-                this.memory.pathing.stuckCount = this.memory.pathing.stuckCount+1;
-            } else {
-                this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
-            }
-        }
+        // if(this.memory.pathing && this.memory.pathing.stuckCount % 3 == 0) {
+        //     delete this.memory._move;
+        //     this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
+        //     opts.ignoreCreeps = false;
+        // }
+        // else if(this.fatigue == 0) {
+        //     if(this.memory.pathing && this.memory.pathing.lastX == this.pos.x && this.memory.pathing.lastY == this.pos.y) {
+        //         this.memory.pathing.stuckCount = this.memory.pathing.stuckCount+1;
+        //     } else {
+        //         this.memory.pathing = { stuckCount: 1, lastX: this.pos.x, lastY: this.pos.y };
+        //     }
+        // }
         
         if(Math.random() < 0.2) {
-            // if(this.memory._move) delete this.memory._move;
+            if(this.memory._move) delete this.memory._move;
             opts.ignoreCreeps = false;
         }
 

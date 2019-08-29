@@ -83,7 +83,7 @@ upgrader.run = function(creep) {
 };
 upgrader.base = [WORK,CARRY,MOVE];
 upgrader.add = {
-    0: { type: WORK, amt: 19 },
+    0: { type: WORK, amt: 14 },
     1: { type: CARRY, amt: 14 },
     2: { type: MOVE, amt: 14 }
     // 3: { type: MOVE, amt: 23 }

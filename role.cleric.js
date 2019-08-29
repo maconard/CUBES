@@ -17,7 +17,7 @@ cleric.run = function(creep) {
             filter: (c) => (c.hits < c.hitsMax)});
         let target = creep.pos.findClosestByRange(healTargets);
         if(target) {
-            creep.say("💉d");
+            // creep.say("💉d");
             creep.heal(target);
             return;
         }
@@ -26,7 +26,7 @@ cleric.run = function(creep) {
         let target = Game.creeps[creep.memory.target];
         if(target) {
             if(target.hits < target.hitsMax) {
-                creep.say("💉t");
+                // creep.say("💉t");
                 if(creep.heal(target) == ERR_NOT_IN_RANGE) {  
                     creep.moveTo(target);
                 }
